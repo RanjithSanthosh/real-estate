@@ -10,7 +10,7 @@ import {
   Instagram,
   Linkedin,
   Youtube,
-  Pinterest,
+  
 } from "lucide-react";
 import React from "react";
 
