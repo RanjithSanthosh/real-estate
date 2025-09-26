@@ -7,7 +7,7 @@ import {
   FaPhoneAlt, FaChevronDown, FaSearch, FaUser, FaShoppingBag, 
   FaEnvelope, FaWhatsapp, FaComments
 } from 'react-icons/fa';
-
+// import eteImage from "./assets/ETEproperty.png";
 // A simple SVG placeholder for the logo
 const HomeKonnectLogo = (props: React.SVGProps<SVGSVGElement>) => (
   <svg {...props} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -91,7 +91,7 @@ export default function ContactPage() {
                     </div>
                     <div className="grid lg:grid-cols-2 gap-12 items-start">
                         <div>
-                            <Image src="https://i.imgur.com/uSfeE4g.png" alt="Map to office" width={600} height={600} className="w-full h-auto rounded-lg shadow-md"/>
+                            {/* <Image src={eteImage} width={600} height={600} className="w-full h-auto rounded-lg shadow-md"/> */}
                         </div>
                         <form className="space-y-6">
                             <input type="text" placeholder="Name" className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"/>
