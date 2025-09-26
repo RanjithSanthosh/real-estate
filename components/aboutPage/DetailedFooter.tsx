@@ -28,7 +28,7 @@ export default function DetailedFooter() {
     { href: "#", icon: Instagram, name: "Instagram" },
     { href: "#", icon: Linkedin, name: "LinkedIn" },
     { href: "#", icon: Youtube, name: "YouTube" },
-    { href: "#", icon: Pinterest, name: "Pinterest" },
+    // { href: "#", icon: Pinterest, name: "Pinterest" },
   ];
 
   const contactLinks = [
