@@ -218,7 +218,8 @@ import CuratedCollections from '@/components/homePage/CuratedCollections';
 import Testimonials from '@/components/homePage/Testimonials';
 import CallToActionAndReviews from '@/components/homePage/CallToActionAndReviews';
 import NewsletterSubscription from '@/components/homePage/NewsletterSubscription';
-import DetailedFooter from '@/components/homePage/DetailedFooter';
+import DetailedFooter from '@/components/aboutPage/DetailedFooter';
+import SiteMapFooter from '@/components/homePage/SiteMapFooter';
 
 /**
  * This is the primary landing page component.
@@ -240,6 +241,8 @@ export default function HomePage() {
         <Testimonials />
         <CallToActionAndReviews />
         <NewsletterSubscription />
+        <SiteMapFooter />
+
       </main>
 
       {/* The DetailedFooter is the single, final element of the page, living outside the <main> content. */}
