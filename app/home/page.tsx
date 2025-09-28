@@ -1,7 +1,7 @@
 
 
 
-'use client';
+
 
 import React, { Suspense, useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
@@ -114,7 +114,7 @@ export default function HomePage() {
   return (
     <div>
 
-      {/* <Suspense> */}
+      <Suspense>
         
      
       <HeroSection
@@ -153,7 +153,7 @@ export default function HomePage() {
         )}
       </main>
       <DetailedFooter />
-       {/* </Suspense> */}
+       </Suspense>
     </div>
   );
 }
