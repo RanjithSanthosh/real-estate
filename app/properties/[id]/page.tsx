@@ -504,7 +504,7 @@ import { Heart, MapPin, Phone, Share2, Printer, Car, Building2, BedDouble, Scali
 import DetailedFooter from '@/components/aboutPage/DetailedFooter';
 import SiteMapFooter from '@/components/homePage/SiteMapFooter';
 // --- MAIN PAGE COMPONENT ---
-export default function PropertyDetailPage({ params }: { params: { id: string } }) {
+export default function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const property = propertiesData.find(p => p.id.toString() === resolvedParams.id);
 
