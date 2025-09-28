@@ -120,7 +120,15 @@ export default function HomeClient() {
           <>
             <PropertyListings
               propertiesToShow={propertiesToShow}
-              // ... pass other necessary props
+              totalProperties={filteredAndSortedProperties.length}
+              totalPages={Math.ceil(filteredAndSortedProperties.length / ITEMS_PER_PAGE)}
+              currentPage={currentPage}
+              filterType={filterType}
+              sortOrder={sortOrder}
+              startIndex={(currentPage - 1) * ITEMS_PER_PAGE}
+              onFilterChange={handleFilterChange}
+              onSortChange={handleSortChange}
+              onPageChange={handlePageChange}
             />
             <SiteMapFooter />
           </>
