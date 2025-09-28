@@ -6,6 +6,9 @@ import { useUI, FilterState } from '../../app/context/UIContext';
 
 interface FilterModalProps {
   onClose: () => void;
+  onApply: (newFilters: FilterState) => void;
+  onClear: () => void;
+  initialFilters: FilterState;
 }
 
 // Reusable Select Component for dropdowns
@@ -25,20 +28,21 @@ const CustomSelect = ({ label, value, onChange, options }: { label: string, valu
   </div>
 );
 
-export default function FilterModal({ onClose }: FilterModalProps) {
-  const { filters: globalFilters, applyFilters, clearFilters } = useUI();
-  const [localFilters, setLocalFilters] = useState<FilterState>(globalFilters);
+export default function FilterModal({ onClose, onApply, onClear, initialFilters }: FilterModalProps) {
+  const [localFilters, setLocalFilters] = useState<FilterState>(initialFilters);
 
   useEffect(() => {
-    setLocalFilters(globalFilters);
-  }, [globalFilters]);
+    setLocalFilters(initialFilters);
+  }, [initialFilters]);
 
   const handleApply = () => {
-    applyFilters(localFilters);
+    onApply(localFilters);
+    onClose();
   };
 
   const handleClear = () => {
-    clearFilters();
+    onClear();
+    setLocalFilters(initialFilters);
   };
   
   const handleCheckboxChange = (field: keyof FilterState['others']) => {
