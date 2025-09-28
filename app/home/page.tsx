@@ -114,7 +114,7 @@ export default function HomePage() {
   return (
     <div>
 
-      <Suspense>
+      {/* <Suspense> */}
         
      
       <HeroSection
@@ -153,7 +153,7 @@ export default function HomePage() {
         )}
       </main>
       <DetailedFooter />
-       </Suspense>
+       {/* </Suspense> */}
     </div>
   );
 }
