@@ -308,6 +308,11 @@ export default function HomeClient() {
               totalProperties={filteredProperties.length}
               totalPages={Math.ceil(filteredProperties.length / ITEMS_PER_PAGE)}
               currentPage={currentPage}
+              filterType={activeFilters.propertyType}
+              sortOrder={"Default"}
+              startIndex={(currentPage - 1) * ITEMS_PER_PAGE}
+              onFilterChange={() => {}}
+              onSortChange={() => {}}
               onPageChange={handlePageChange}
             />
             <SiteMapFooter />
