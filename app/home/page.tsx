@@ -1,8 +1,4 @@
-
-
-
-
-
+'use client';
 import React, { Suspense, useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { propertiesData } from '../data/properties';
