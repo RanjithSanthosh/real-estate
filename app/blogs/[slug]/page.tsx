@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { use } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -159,8 +159,8 @@ function RelatedBlogCard({ blog }: { blog: Blog }) {
 
 
 export default function BlogDetailPage({ params }: { params: { slug: string } }) {
-    const resolvedParams = use(params);
-    const blog = blogsData.find(b => b.slug === resolvedParams.slug);
+    // const resolvedParams = use(params);
+    const blog = blogsData.find(b => b.slug === params.slug);
 
     if (!blog) {
         notFound();
