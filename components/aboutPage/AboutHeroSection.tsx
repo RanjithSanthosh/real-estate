@@ -98,6 +98,9 @@ import {
   X,
   User
 } from "lucide-react";
+  import { useUI } from '../../app/context/UIContext';
+import Link from "next/link";
+
 import { useState, useRef, useEffect } from "react";
 import Image from 'next/image';
 // import { ChevronDown, Phone, Heart, UserCircle2, Menu, X } from 'lucide-react';
@@ -116,6 +119,7 @@ export default function AboutHeroSection() {
   const [selectedCity, setSelectedCity] = useState("All Cities");
     const cities = ["Mumbai", "Delhi", "Bangalore", "Chennai", "Kolkata"];
   
+    const { openLoginModal } = useUI();
 
       useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -198,9 +202,11 @@ export default function AboutHeroSection() {
                     </div>
                   )}
                 </div>
-            <a href="/home" className="hover:text-green-300 transition-colors">Home</a>
-                <a href="/about" className="hover:text-green-300 transition-colors">About</a>
-                <a href="/contact" className="hover:text-green-300 transition-colors">Contact Us</a>
+                <Link href="/home" className="hover:text-green-300 transition-colors">Home</Link>
+                <Link href="/about" className="hover:text-green-300 transition-colors">About</Link>
+                <Link href="/contact" className="hover:text-green-300 transition-colors">Contact Us</Link>
+                <Link href="/blogs" className="hover:text-green-300 transition-colors">Blog</Link>
+                <Link href="/careers" className="hover:text-green-300 transition-colors">Careers</Link>
           </div>
 
           {/* Right side icons and call */}
@@ -210,8 +216,10 @@ export default function AboutHeroSection() {
                 </button>
                 <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><Heart size={20} /></button>
                 <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><UserCircle2 size={20} /></button>
-                <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><User size={20} /></button>
-
+                {/* <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><User size={20} /></button> */}
+      <button onClick={openLoginModal}>
+                      <User size={22} className="cursor-pointer hover:text-green-600" />
+                  </button>
                 {/* Hamburger Menu Button */}
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -224,12 +232,14 @@ export default function AboutHeroSection() {
           {/* Mobile Menu Overlay */}
           {isMenuOpen && (
             <div className="absolute top-full right-6 mt-2 w-48 bg-white text-black rounded-lg shadow-lg p-4 flex flex-col gap-4 lg:hidden">
-              <a href="/" className="hover:text-green-600">Home</a>
-              <a href="/about" className="hover:text-green-600">About</a>
-              <a href="/contact" className="hover:text-green-600">Contact Us</a>
+             <Link href="/home" className="hover:text-green-300 transition-colors">Home</Link>
+                <Link href="/about" className="hover:text-green-300 transition-colors">About</Link>
+                <Link href="/contact" className="hover:text-green-300 transition-colors">Contact Us</Link>
+                <Link href="/blogs" className="hover:text-green-300 transition-colors">Blog</Link>
+                <Link href="/careers" className="hover:text-green-300 transition-colors">Careers</Link>
               <a href="#" className="sm:hidden flex items-center gap-2 hover:text-green-600"><Phone size={16}/> Call Us</a>
               <a href="#" className="md:hidden flex items-center gap-2 hover:text-green-600"><Heart size={16}/> Wishlist</a>
-              <a href="#" className="md:hidden flex items-center gap-2 hover:text-green-600"><UserCircle2 size={16}/> Profile</a>
+              <Link href="#" className="md:hidden flex items-center gap-2 hover:text-green-600"><UserCircle2 size={16}/> Profile</Link>
             </div>
           )}
         </nav>

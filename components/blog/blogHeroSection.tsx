@@ -1,3 +1,4 @@
+
 // components/aboutPage/AboutHeroSection.tsx
 "use client";
 import Link from "next/link";
@@ -115,7 +116,7 @@ export default function AboutHeroSection() {
                     </div>
                   )}
                 </div>
-      <Link href="/home" className="hover:text-green-300 transition-colors">Home</Link>
+          <Link href="/home" className="hover:text-green-300 transition-colors">Home</Link>
                 <Link href="/about" className="hover:text-green-300 transition-colors">About</Link>
                 <Link href="/contact" className="hover:text-green-300 transition-colors">Contact Us</Link>
                 <Link href="/blogs" className="hover:text-green-300 transition-colors">Blog</Link>
@@ -143,7 +144,7 @@ export default function AboutHeroSection() {
           {/* Mobile Menu Overlay */}
           {isMenuOpen && (
             <div className="absolute top-full right-6 mt-2 w-48 bg-white text-black rounded-lg shadow-lg p-4 flex flex-col gap-4 lg:hidden">
-<Link href="/home" className="hover:text-green-300 transition-colors">Home</Link>
+           <Link href="/home" className="hover:text-green-300 transition-colors">Home</Link>
                 <Link href="/about" className="hover:text-green-300 transition-colors">About</Link>
                 <Link href="/contact" className="hover:text-green-300 transition-colors">Contact Us</Link>
                 <Link href="/blogs" className="hover:text-green-300 transition-colors">Blog</Link>
@@ -159,8 +160,8 @@ export default function AboutHeroSection() {
       {/* Hero Content (About Us text) */}
       <div className="relative z-20 flex flex-col justify-center h-full text-white px-6 md:px-12"> {/* ✅ Left aligned, added padding */}
         <div className="container mx-auto"> {/* ✅ Constrain content width */}
-          <h1 className="text-5xl md:text-6xl font-bold mb-2">Contact Us</h1>
-          <p className="text-xl text-gray-200">Let Us Connect</p>
+          <h1 className="text-5xl md:text-6xl font-bold mb-2">Blogs</h1>
+          <p className="text-xl text-gray-200">Your Guide to Smarter Property Decisions</p>
         </div>
       </div>
     </div>

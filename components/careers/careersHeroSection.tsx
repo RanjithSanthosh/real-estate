@@ -1,3 +1,5 @@
+
+
 // components/aboutPage/AboutHeroSection.tsx
 "use client";
 import Link from "next/link";
@@ -15,6 +17,8 @@ import {
   X,
   User
 } from "lucide-react";
+  import { useUI } from '../../app/context/UIContext';
+
 import { useState, useRef, useEffect } from "react";
 import Image from 'next/image';
 // import { ChevronDown, Phone, Heart, UserCircle2, Menu, X } from 'lucide-react';
@@ -33,6 +37,7 @@ export default function AboutHeroSection() {
   const [selectedCity, setSelectedCity] = useState("All Cities");
     const cities = ["Mumbai", "Delhi", "Bangalore", "Chennai", "Kolkata"];
   
+    const { openLoginModal } = useUI();
 
       useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -115,7 +120,7 @@ export default function AboutHeroSection() {
                     </div>
                   )}
                 </div>
-      <Link href="/home" className="hover:text-green-300 transition-colors">Home</Link>
+            <Link href="/home" className="hover:text-green-300 transition-colors">Home</Link>
                 <Link href="/about" className="hover:text-green-300 transition-colors">About</Link>
                 <Link href="/contact" className="hover:text-green-300 transition-colors">Contact Us</Link>
                 <Link href="/blogs" className="hover:text-green-300 transition-colors">Blog</Link>
@@ -129,8 +134,10 @@ export default function AboutHeroSection() {
                 </button>
                 <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><Heart size={20} /></button>
                 <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><UserCircle2 size={20} /></button>
-                <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><User size={20} /></button>
-
+                {/* <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><User size={20} /></button> */}
+      <button onClick={openLoginModal}>
+                      <User size={22} className="cursor-pointer hover:text-green-600" />
+                  </button>
                 {/* Hamburger Menu Button */}
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -143,7 +150,7 @@ export default function AboutHeroSection() {
           {/* Mobile Menu Overlay */}
           {isMenuOpen && (
             <div className="absolute top-full right-6 mt-2 w-48 bg-white text-black rounded-lg shadow-lg p-4 flex flex-col gap-4 lg:hidden">
-<Link href="/home" className="hover:text-green-300 transition-colors">Home</Link>
+             <Link href="/home" className="hover:text-green-300 transition-colors">Home</Link>
                 <Link href="/about" className="hover:text-green-300 transition-colors">About</Link>
                 <Link href="/contact" className="hover:text-green-300 transition-colors">Contact Us</Link>
                 <Link href="/blogs" className="hover:text-green-300 transition-colors">Blog</Link>
@@ -159,8 +166,8 @@ export default function AboutHeroSection() {
       {/* Hero Content (About Us text) */}
       <div className="relative z-20 flex flex-col justify-center h-full text-white px-6 md:px-12"> {/* ✅ Left aligned, added padding */}
         <div className="container mx-auto"> {/* ✅ Constrain content width */}
-          <h1 className="text-5xl md:text-6xl font-bold mb-2">Contact Us</h1>
-          <p className="text-xl text-gray-200">Let Us Connect</p>
+          <h1 className="text-5xl md:text-6xl font-bold mb-2">Careers</h1>
+          <p className="text-xl text-gray-200">Come grow with us</p>
         </div>
       </div>
     </div>

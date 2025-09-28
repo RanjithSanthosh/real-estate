@@ -5,8 +5,7 @@ import {
   Bitcount_Grid_Double,
   Montserrat,
 } from "next/font/google";
-import "./globals.css";
-import { UIProvider } from "./context/UIContext"; // ✅ Import the UIProvider
+import { UIProvider } from "../context/UIContext"; // ✅ Import the UIProvider
 import GlobalModal from "@/components/shared/GlobalModal"; // ✅ Import the GlobalModal
 import Chatbot from "@/components/shared/Chatbot";
 import FloatingWhatsappButton from "@/components/shared/FloatingWhatsappButton"; // ✅ Import the new component
@@ -43,27 +42,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${montserrat.className} ${geistSans.variable} ${geistMono.variable}  antialiased`}
-      >
+<>
 
        <UIProvider>
           {children}
           <GlobalModal />
 
+            {/* <FloatingWhatsappButton /> */}
 
 
-    <div className="">  
-      {/* fixed bottom-5 right-5 z-50 flex flex-col items-end gap-4 */}
-            <FloatingWhatsappButton />
 
-            <Chatbot />
-    </div>
+            {/* <Chatbot /> */}
 
         </UIProvider>
-      </body>
-    </html>
+</>
+
+  
   );
 }
 
