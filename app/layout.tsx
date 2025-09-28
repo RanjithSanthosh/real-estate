@@ -47,20 +47,14 @@ export default function RootLayout({
       <body
         className={`${montserrat.className} ${geistSans.variable} ${geistMono.variable}  antialiased`}
       >
-
-       <UIProvider>
+        <UIProvider>
           {children}
           <GlobalModal />
-
-
-
-    <div className="">  
-      {/* fixed bottom-5 right-5 z-50 flex flex-col items-end gap-4 */}
+          {/* Floating buttons container: lower z-index, pointer-events-none if property list is open */}
+          <div id="floating-buttons-container" className="fixed bottom-5 right-5 z-30 flex flex-col items-end gap-4">
             <FloatingWhatsappButton />
-
             <Chatbot />
-    </div>
-
+          </div>
         </UIProvider>
       </body>
     </html>

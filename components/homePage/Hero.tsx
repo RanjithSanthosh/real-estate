@@ -35,8 +35,9 @@ import Link from "next/link";
     const [selectedCity, setSelectedCity] = useState("All Cities");
     const cityDropdownRef = useRef<HTMLDivElement>(null);
     const cities = ["Mumbai", "Delhi", "Bangalore", "Chennai", "Kolkata"];
+    const { openLoginModal, openFilterModal ,openOfferModal } = useUI();
 
-    const { openLoginModal } = useUI();
+    // const { openLoginModal } = useUI();
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
@@ -121,8 +122,10 @@ import Link from "next/link";
                   <button className="hidden sm:flex items-center gap-2 border backdrop-blur-sm px-4 py-2 rounded-3xl font-medium">
                       <Phone size={16} /> Call Us <span className="ml-1">🇮🇳</span>
                   </button>
-                  <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><Gift  size={20} /></button>
-                  <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><Search size={20} /></button>
+                  {/* <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><Gift  size={20} /></button> */}
+                   <button onClick={openOfferModal} className="p-2 hover:bg-white/20 rounded-full transition-colors"><Gift size={20} className="text-white" /></button>
+                   
+                  <button  onClick={onSearchClick} className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><Search size={20} /></button>
                   <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><Heart size={20} /></button>
                   {/* <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><User size={20} /></button> */}
                   <button onClick={openLoginModal}>
@@ -177,8 +180,11 @@ import Link from "next/link";
                     />
                 </div>
                 <div className="flex items-center gap-2 p-2 md:p-0">
-                    <button className="p-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors"><SlidersHorizontal size={20} /></button>
-                    <button className="p-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors"><Settings2 size={20} /></button>
+                    {/* <button className="p-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors"><SlidersHorizontal size={20} /></button> */}
+   <button onClick={openFilterModal} className="p-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors">
+              <SlidersHorizontal size={20} />
+            </button>
+                    <button className="p-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors" ><Settings2 size={20} /></button>
                     <button
                       onClick={onSearchClick}
                       className="p-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors"
