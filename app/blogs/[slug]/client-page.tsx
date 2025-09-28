@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-// import Navbar from '@/components/shared/Navbar';
+import { notFound } from 'next/navigation';
+import Navbar from '@/components/shared/Navbar';
 import { blogsData, Blog, BlogContent } from '../../data/blogs';
 import { CalendarDays, Palmtree, MapPin, Home, Hammer, Lightbulb, CheckCircle2, Share2, Phone } from 'lucide-react';
 
@@ -83,11 +84,16 @@ function RelatedBlogCard({ blog }: { blog: Blog }) {
     );
 }
 
-// --- This is now the Client Component for the page UI ---
+// --- Main Client Component for the Blog Detail Page UI ---
 export default function BlogClientPage({ blog, relatedBlogs }: { blog: Blog, relatedBlogs: Blog[] }) {
+    // This check prevents a crash if the blog prop is somehow undefined.
+    if (!blog) {
+        return null;
+    }
+
     return (
         <div className="bg-white font-sans">
-            {/* <Navbar /> */}
+            <Navbar />
             <main>
                 <div className="container mx-auto max-w-4xl px-4 py-12 md:py-16">
                     {/* Blog Header */}

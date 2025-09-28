@@ -164,24 +164,46 @@
 
 
 
+// import { notFound } from 'next/navigation';
+// import { blogsData } from '../../data/blogs';
+// import BlogClientPage from './client-page'; // Import the client component
+
+// // ✅ Add the 'async' keyword here to fix the error
+// export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
+//     // 1. Find the blog data on the server
+//     const blog = blogsData.find(b => b.slug === params.slug);
+
+//     if (!blog) {
+//         notFound();
+//     }
+
+//     // 2. Find the related blogs data on the server
+//     const relatedBlogs = blogsData.filter(b => 
+//         blog.relatedBlogsSlugs?.includes(b.slug) && b.slug !== blog.slug
+//     ).slice(0, 3);
+
+//     // 3. Render the Client Component and pass the data down as props
+//     return <BlogClientPage blog={blog} relatedBlogs={relatedBlogs} />;
+// }
+
+
 import { notFound } from 'next/navigation';
 import { blogsData } from '../../data/blogs';
-import BlogClientPage from './client-page'; // Import the client component
+import BlogClientPage from './client-page';
 
-// ✅ Add the 'async' keyword here to fix the error
 export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
-    // 1. Find the blog data on the server
+    // ✅ Add these two lines for debugging
+    console.log("SERVER: Looking for blog with slug:", params.slug);
     const blog = blogsData.find(b => b.slug === params.slug);
+    console.log("SERVER: Blog found?", blog ? blog.title : "No blog found!");
 
     if (!blog) {
         notFound();
     }
 
-    // 2. Find the related blogs data on the server
     const relatedBlogs = blogsData.filter(b => 
         blog.relatedBlogsSlugs?.includes(b.slug) && b.slug !== blog.slug
     ).slice(0, 3);
 
-    // 3. Render the Client Component and pass the data down as props
     return <BlogClientPage blog={blog} relatedBlogs={relatedBlogs} />;
 }
