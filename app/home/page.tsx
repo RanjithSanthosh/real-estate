@@ -3,7 +3,7 @@
 
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { Suspense, useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { propertiesData } from '../data/properties';
 import HeroSection from '@/components/homePage/heroSection';
@@ -113,6 +113,10 @@ export default function HomePage() {
 
   return (
     <div>
+
+      <Suspense>
+        
+     
       <HeroSection
         onSearchClick={toggleSearchView}
         searchTerm={searchTerm}
@@ -149,6 +153,7 @@ export default function HomePage() {
         )}
       </main>
       <DetailedFooter />
+       </Suspense>
     </div>
   );
 }
