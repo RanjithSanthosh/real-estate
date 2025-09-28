@@ -1,10 +1,13 @@
 'use client';
+import { Suspense } from 'react'
 import React from 'react'
 import Home from './home/page'
 const page = () => {
   return (
     <div>
-      <Home/>
+       <Suspense>
+        <Home />
+      </Suspense>
     </div>
   )
 }
