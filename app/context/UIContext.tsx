@@ -213,6 +213,11 @@ interface UIContextType {
    isOfferModalOpen: boolean; // ✅ Added for the new offer modal
   openOfferModal: () => void; // ✅ Added for the new offer modal
   closeOfferModal: () => void; // ✅ Added for the new offer modal
+
+
+  isConsultationModalOpen: boolean; // ✅ Add this
+  openConsultationModal: () => void;   // ✅ Add this
+  closeConsultationModal: () => void;  // ✅ Add this
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
@@ -241,6 +246,7 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false); // ✅ New state for offer modal for gift
+ const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false); // ✅ Add state for consultancy
 
   // Close all other modals when one is opened
   const openLoginModal = () => {
@@ -296,6 +302,15 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
 
 
 
+   const openConsultationModal = () => {
+    setIsLoginModalOpen(false);
+    setIsFilterModalOpen(false);
+    setIsOfferModalOpen(false);
+    setIsConsultationModalOpen(true);
+  };
+  const closeConsultationModal = () => setIsConsultationModalOpen(false);
+
+
   // ✅ Add the chatbot state and function to the provider's value
   const value = {
     isLoginModalOpen,
@@ -314,10 +329,13 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
     applyFilters,
     clearFilters,
 
+    isOfferModalOpen,
+    openOfferModal,
+    closeOfferModal,
 
-     isOfferModalOpen, // ✅ Add to context value
-    openOfferModal,   // ✅ Add to context value
-    closeOfferModal,  // ✅ Add to context value
+    isConsultationModalOpen,
+    openConsultationModal,
+    closeConsultationModal,
   };
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;

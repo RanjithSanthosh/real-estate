@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 // import Link from "next/link";
 // import { useState, useRef, useEffect } from "react";
 // import Image from "next/image";
@@ -19,6 +19,9 @@
 // } from "lucide-react";
 // import heroImage from "./assets/Hero.png";
 // import logoImage from "./assets/logo.png";
+import ConsultationModal from "../shared/ConsultationModal";
+// import ConsultationModal from "../shared/ConsultationModal";
+// import ConsultationModal from "../shared/ConsultationModal";
 // import { useUI } from "../../app/context/UIContext";
 
 // // Define an interface for the component's props
@@ -309,7 +312,7 @@
 
 
 
-"use client";
+// 'use client';
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
@@ -352,7 +355,8 @@ export default function Hero({
   const searchBarRef = useRef<HTMLDivElement>(null);
   
   const cities = ["Mumbai", "Delhi", "Bangalore", "Chennai", "Kolkata"];
-  const { openLoginModal, openFilterModal, openOfferModal } = useUI();
+  const { openLoginModal, openFilterModal, openOfferModal, openConsultationModal, isConsultationModalOpen, closeConsultationModal } = useUI();
+  // ...existing code...
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -391,6 +395,12 @@ export default function Hero({
         priority
       />
       <div className="absolute inset-0 bg-black/50 z-10" />
+      {/* Consultation Modal Popup */}
+      {isConsultationModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <ConsultationModal onClose={closeConsultationModal} />
+        </div>
+      )}
 
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 z-30">
@@ -440,7 +450,7 @@ export default function Hero({
           </div>
 
           <div className="flex items-center gap-4">
-            <button className="hidden sm:flex items-center gap-2 border backdrop-blur-sm px-4 py-2 rounded-3xl font-medium">
+            <button onClick={openConsultationModal} className="hidden sm:flex items-center gap-2 border backdrop-blur- px-4 py-2 rounded-3xl font-medium">
               <Phone size={16} /> Call Us{" "}
               <Image src="/assets/indiaFlag.png" alt="India flag" width={20} height={15} className="ml-1"/>
             </button>
