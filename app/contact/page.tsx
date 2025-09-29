@@ -135,7 +135,7 @@
 
 
 
-
+'use client'
 // app/about/page.tsx
 import ContactHeroSection from "@/components/contactPage/ContactHeroSection";
 import ContactPage from "@/components/contactPage/ContactPage";
@@ -149,9 +149,22 @@ import DetailedFooter from "@/components/aboutPage/DetailedFooter";
 import React from "react";
 
 export default function AboutUsPage() {
+  // Add local state and handlers for search functionality
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+  };
+  const handleSearchClick = () => {
+    // You can add scroll or other logic here if needed
+  };
+
   return (
     <div className="overflow-hidden">
-      <ContactHeroSection />
+      <ContactHeroSection
+        onSearchClick={handleSearchClick}
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+      />
 
       <main>
         {/* <TeamQuoteSection />
@@ -164,7 +177,6 @@ export default function AboutUsPage() {
       <footer>
         <SiteMapFooter />
         <DetailedFooter />
-        
       </footer>
     </div>
   );
