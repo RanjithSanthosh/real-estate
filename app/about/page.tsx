@@ -11,9 +11,22 @@ import DetailedFooter from "@/components/aboutPage/DetailedFooter";
 import React from "react";
 
 export default function AboutUsPage() {
+  // Add local state and handlers for search functionality
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+  };
+  const handleSearchClick = () => {
+    // You can add scroll or other logic here if needed
+  };
+
   return (
     <div className="overflow-hidden">
-      <AboutHeroSection />
+      <AboutHeroSection
+        onSearchClick={handleSearchClick}
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+      />
 
       <main>
         <TeamQuoteSection />
