@@ -947,7 +947,79 @@ export const propertiesData: Property[] = [
         { name: 'Garden', icon: Sprout },
     ],
   },
-  {
+    {
+    id: 4,
+    name: 'CASA GRANDE',
+    developer: 'Emaar Properties',
+    developerId: 2, // Linking to Prestige Group developer
+    location: 'Velachery, Chennai',
+    priceRange: '₹ 3.5 Cr. - 4.2 Cr.',
+    images: [
+      '/properties/property.jpg',
+      '/properties/property.jpg',
+      '/properties/property.jpg',
+      '/properties/property.jpg',
+    ],
+      mapImage: '/maps/map.png', 
+    tag: { text: 'Under Construction', color: 'yellow' },
+    specs: [
+      { icon: Building2, text: 'Villa' },
+      { icon: BedDouble, text: '4 BHK' },
+      { icon: Scaling, text: '3100 - 3400 Sq.Ft' },
+    ],
+    overview: {
+      pricePerSqFt: '₹ 11,000',
+      totalUnits: 40,
+      projectRera: 'PRM/KA/RERA/1251/310/PR/190724/007044',
+      zoning: 'Residential',
+      propertyType: 'Villa',
+      status: 'Under Construction',
+      landExtent: '2.5 Acres',
+    },
+    description: "Casa Grande offers a serene living experience with its spacious villas and lush green surroundings. Located in the heart of Velachery, it provides excellent connectivity to the city's major hubs, making it an ideal choice for families and professionals alike.",
+      salientFeatures: [
+        'Centralised VRV ACs',
+        'IOT enabled Smart-Ready Homes',
+        'False ceiling with Designer Lights',
+        'Landscaped Terrace & Gym',
+    ],
+    specifications: {
+        Flooring: [
+            'Toilets: Ceramic Tiles',
+            'Master Bedroom: Vitrified Tiled Flooring',
+            'Other Bedroom: Vitrified Tiled Flooring',
+            'Balcony: Ceramic Tiles',
+            'Kitchen: ceramic tile flooring',
+            'Living/Dining: Vitrified Tiles',
+        ],
+        Doors: [ 'Main Door: Teak Wood Frame', 'Internal Doors: Hardwood Frame' ],
+        Walls: [ 'Interior: Emulsion Paint', 'Exterior: Weatherproof Paint' ],
+        Fittings: [ 'Kitchen: Granite Platform with Stainless Steel Sink', 'Toilets: CP Fittings of Jaguar or equivalent' ],
+        Others: [ 'Wiring: Concealed Copper Wiring', 'Power Backup: DG set for common areas' ],
+    },
+    floorplans: [
+        {
+            name: 'AMARA ADHYA - 3BHK',
+            priceRange: '₹ 5.0 Cr. - 5.9 Cr.',
+            image: '/properties/property.jpg',
+            specs: [{ icon: Building2, text: 'Apartments' }, { icon: BedDouble, text: '3 BHK' }, { icon: Scaling, text: '2351 - 2454 Sq.Ft' }]
+        },
+        {
+            name: 'AMARA ADHYA - 5BHK',
+            priceRange: '₹ 8 Cr. - 10 Cr.',
+            image: '/properties/property2.jpg',
+            specs: [{ icon: Building2, text: 'Apartments' }, { icon: BedDouble, text: '5 BHK' }, { icon: Scaling, text: '4351 - 4454 Sq.Ft' }]
+        }
+    ],
+    amenities: [
+        { name: 'Maintenance Staff', icon: Wrench },
+        { name: 'Parks', icon: Trees },
+        { name: 'Gym', icon: Dumbbell },
+        { name: 'Kids Area', icon: ToyBrick },
+        { name: 'Garden', icon: Sprout },
+    ],
+  },
+    {
     id: 3,
     name: 'CASA GRANDE',
     developer: 'Emaar Properties',
@@ -955,7 +1027,7 @@ export const propertiesData: Property[] = [
     location: 'Velachery, Chennai',
     priceRange: '₹ 3.5 Cr. - 4.2 Cr.',
     images: [
-   '/properties/property.jpg',
+      '/properties/property.jpg',
       '/properties/property.jpg',
       '/properties/property.jpg',
       '/properties/property.jpg',

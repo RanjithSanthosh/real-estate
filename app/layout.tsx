@@ -51,10 +51,15 @@ export default function RootLayout({
           {children}
           <GlobalModal />
           {/* Floating buttons container: lower z-index, pointer-events-none if property list is open */}
-          <div id="floating-buttons-container" className="fixed bottom-5 right-5 z-30 flex flex-col items-end gap-4">
+          <div
+            id="floating-buttons-container"
+            className="fixed bottom-5 right-5 z-30 flex flex-col items-end gap-4"
+          >
             <FloatingWhatsappButton />
             <Chatbot />
           </div>
+
+
         </UIProvider>
       </body>
     </html>
@@ -62,12 +67,6 @@ export default function RootLayout({
 }
 
 // //  ${geistSans.variable} ${geistMono.variable}
-
-
-
-
-
-
 
 // import type { Metadata } from "next";
 // import {
