@@ -1,18 +1,32 @@
+'use client';
 import React from 'react'
-import Careers from '@/components/careers/careersHeroSection';
+import AboutHeroSection from '@/components/careers/careersHeroSection';
 import JobResults from '@/components/careers/JobResults';
 import SiteMapFooter from "@/components/aboutPage/SiteMapFooter";
 import DetailedFooter from "@/components/aboutPage/DetailedFooter";
 
 const page = () => {
+  // Add local state and handlers for search functionality
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+  };
+  const handleSearchClick = () => {
+    // You can add scroll or other logic here if needed
+  };
+
   return (
     <div>
-      <Careers/>
+      <AboutHeroSection
+        onSearchClick={handleSearchClick}
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+      />
       <JobResults/>
-       <footer>
-              <SiteMapFooter />
-              <DetailedFooter />
-            </footer>
+      <footer>
+        <SiteMapFooter />
+        <DetailedFooter />
+      </footer>
     </div>
   )
 }
