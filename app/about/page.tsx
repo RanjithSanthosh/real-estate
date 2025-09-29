@@ -1,4 +1,4 @@
-
+'use client'
 
 // app/about/page.tsx
 import AboutHeroSection from "@/components/aboutPage/AboutHeroSection";

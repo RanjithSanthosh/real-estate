@@ -50,7 +50,8 @@ interface UIContextType {
   closeConsultationModal: () => void;  // ✅ Add this
 
 
-   propertyForVisit: Property | null; // ✅ State to hold the selected property's data
+  isScheduleVisitModalOpen: boolean; // ✅ Add missing modal state
+  propertyForVisit: Property | null; // ✅ State to hold the selected property's data
   openScheduleVisitModal: (property: Property) => void; // ✅ Function to open modal WITH data
   closeScheduleVisitModal: () => void;
 }
