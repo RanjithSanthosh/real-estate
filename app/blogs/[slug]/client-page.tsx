@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import Navbar from '@/components/shared/Navbar';
+// import Navbar from '@/components/shared/Navbar';
 import { blogsData, Blog, BlogContent } from '../../data/blogs';
 import { CalendarDays, Palmtree, MapPin, Home, Hammer, Lightbulb, CheckCircle2, Share2, Phone } from 'lucide-react';
 
@@ -93,7 +93,7 @@ export default function BlogClientPage({ blog, relatedBlogs }: { blog: Blog, rel
 
     return (
         <div className="bg-white font-sans">
-            <Navbar />
+            {/* <Navbar /> */}
             <main>
                 <div className="container mx-auto max-w-4xl px-4 py-12 md:py-16">
                     {/* Blog Header */}
