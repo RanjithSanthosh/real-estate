@@ -395,10 +395,8 @@ export default function HomeClient() {
     <div>
       <HeroSection
         onSearchClick={toggleSearchView}
-        onHeaderSearchClick={handleHeaderSearchClick}
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
-        searchBarRef={searchBarRef}
       />
       <main>
         {isSearching ? (
