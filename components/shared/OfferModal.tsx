@@ -58,7 +58,7 @@ export default function OfferModal({ onClose }: OfferModalProps) {
             placeholder="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+            className="w-full p-3 border border-gray-300 rounded-2xl focus:ring-green-500 focus:border-green-500"
             required
           />
           <input
@@ -66,7 +66,7 @@ export default function OfferModal({ onClose }: OfferModalProps) {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+            className="w-full p-3 border border-gray-300 rounded-2xl focus:ring-green-500 focus:border-green-500"
             required
           />
           <div className="flex">
@@ -78,13 +78,13 @@ export default function OfferModal({ onClose }: OfferModalProps) {
               placeholder="Phone Number"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              className="flex-grow p-3 border border-gray-300 rounded-r-lg focus:ring-green-500 focus:border-green-500"
+              className="flex-grow p-3 border border-gray-300 rounded-r-2xl focus:ring-green-500 focus:border-green-500"
               required
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-colors"
+            className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-2xl hover:bg-green-700 transition-colors"
           >
             Get a Call
           </button>

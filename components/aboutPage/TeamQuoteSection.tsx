@@ -1,25 +1,44 @@
-// 'use client';
+
+
 // // components/aboutPage/TeamQuoteSection.tsx
+// "use client";
+
 // import Image from 'next/image';
 // import React from 'react';
 
+// // You'll need to add your actual team photo to the public/assets directory
+// import teamPhoto from '../../public/assets/aboutPage/Team.png'; 
+
 // export default function TeamQuoteSection() {
 //   return (
-//     <section className="py-16 bg-white">
+//     <section className="bg-white py-16 lg:py-24 pb-0 lg:pb-0">
 //       <div className="container mx-auto px-6 text-center">
-//         <h2 className="text-lg text-gray-600 font-semibold mb-2">About Home Konnect®</h2>
-//         <p className="text-2xl md:text-3xl font-bold text-gray-800 mb-8 max-w-3xl mx-auto">
-//           &quot;GREAT THINGS IN BUSINESS ARE NEVER DONE BY ONE PERSON. THEY&apos;RE DONE BY A TEAM OF PEOPLE&quot;
-//         </p>
-//         <p className="text-gray-500 mb-12">- Steve Jobs</p>
         
-//         <div className="relative w-full h-[500px] rounded-lg overflow-hidden shadow-xl">
+//         {/* Title */}
+//         <h2 className="text-3xl font-bold text-gray-800 mb-6">
+//           About Home Konnect®
+//         </h2>
+        
+//         {/* Quote */}
+//         <blockquote className="max-w-4xl mx-auto">
+//           <p className="text-xl md:text-2xl text-gray-600 leading-relaxed mb-4">
+//             &quot;GREAT THINGS IN BUSINESS ARE NEVER DONE BY ONE PERSON. THEY&apos;RE DONE BY A TEAM OF PEOPLE&quot;
+//           </p>
+//           <footer className="text-lg font-semibold text-yellow-600">
+//             - Steve Jobs
+//           </footer>
+//         </blockquote>
+        
+//         {/* Team Image */}
+//         <div className="mt-12 w-full max-w-5xl mx-auto">
 //           <Image
-//             src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop"
-//             alt="Team meeting and celebration"
-//             fill
-//             style={{ objectFit: "cover" }}
-//             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+//             src={teamPhoto} // Using your local team photo
+//             alt="The Home Konnect team"
+//             width={1200}
+//             height={600}
+//             className="w-full h-auto object-cover" // Ensures the image is responsive
+//             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
+//             priority
 //           />
 //         </div>
 //       </div>
@@ -28,37 +47,82 @@
 // }
 
 
+
 // components/aboutPage/TeamQuoteSection.tsx
 "use client";
 
 import Image from 'next/image';
 import React from 'react';
+import { motion, Variants } from 'framer-motion';
 
 // You'll need to add your actual team photo to the public/assets directory
 import teamPhoto from '../../public/assets/aboutPage/Team.png'; 
 
 export default function TeamQuoteSection() {
+  // Animation Variants
+  const sectionVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.3,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
+
   return (
-    <section className="bg-white py-16 lg:py-24 pb-0 lg:pb-0">
+    <motion.section
+      variants={sectionVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      className="bg-white py-16 lg:py-24 pb-0 lg:pb-0"
+    >
       <div className="container mx-auto px-6 text-center">
         
         {/* Title */}
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">
+        <motion.h2
+          variants={itemVariants}
+          className="text-3xl font-bold text-gray-800 mb-6"
+        >
           About Home Konnect®
-        </h2>
+        </motion.h2>
         
         {/* Quote */}
-        <blockquote className="max-w-4xl mx-auto">
+        <motion.blockquote
+          variants={itemVariants}
+          className="max-w-4xl mx-auto"
+        >
           <p className="text-xl md:text-2xl text-gray-600 leading-relaxed mb-4">
             &quot;GREAT THINGS IN BUSINESS ARE NEVER DONE BY ONE PERSON. THEY&apos;RE DONE BY A TEAM OF PEOPLE&quot;
           </p>
           <footer className="text-lg font-semibold text-yellow-600">
             - Steve Jobs
           </footer>
-        </blockquote>
+        </motion.blockquote>
         
         {/* Team Image */}
-        <div className="mt-12 w-full max-w-5xl mx-auto">
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ 
+            scale: 1.02, 
+            boxShadow: "0px 10px 30px -5px rgba(0, 0, 0, 0.1)" 
+          }}
+          transition={{ duration: 0.3 }}
+          className="mt-12 w-full max-w-5xl mx-auto"
+        >
           <Image
             src={teamPhoto} // Using your local team photo
             alt="The Home Konnect team"
@@ -68,8 +132,8 @@ export default function TeamQuoteSection() {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
             priority
           />
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }

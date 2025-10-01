@@ -148,6 +148,11 @@ import SiteMapFooter from "@/components/aboutPage/SiteMapFooter";
 import DetailedFooter from "@/components/aboutPage/DetailedFooter";
 import React from "react";
 
+
+import GenericHero from "@/components/shared/GenericHero";
+import ContactHERO  from "@/public/assets/aboutPage/AboutHERO.png"; // Your specific background image
+
+
 export default function AboutUsPage() {
   // Add local state and handlers for search functionality
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -160,10 +165,18 @@ export default function AboutUsPage() {
 
   return (
     <div className="overflow-hidden">
-      <ContactHeroSection
+      {/* <ContactHeroSection
         onSearchClick={handleSearchClick}
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
+      /> */}
+
+
+        <GenericHero 
+        title="Contact Us" 
+        subtitle="Let Us Connect" 
+        backgroundImage={ContactHERO}
+        activePage="Contact Us"
       />
 
       <main>

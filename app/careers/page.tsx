@@ -5,6 +5,10 @@ import JobResults from '@/components/careers/JobResults';
 import SiteMapFooter from "@/components/aboutPage/SiteMapFooter";
 import DetailedFooter from "@/components/aboutPage/DetailedFooter";
 
+import GenericHero from "@/components/shared/GenericHero";
+import AboutHERO from "@/public/assets/aboutPage/AboutHERO.png"; // Your specific background image
+
+
 const page = () => {
   // Add local state and handlers for search functionality
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -17,11 +21,20 @@ const page = () => {
 
   return (
     <div>
-      <AboutHeroSection
+      {/* <AboutHeroSection
         onSearchClick={handleSearchClick}
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
+      /> */}
+
+ <GenericHero 
+        title="Careers" 
+        subtitle="Come grow with us" 
+        backgroundImage={AboutHERO}
+        activePage="Careers"
       />
+
+
       <JobResults/>
       <footer>
         <SiteMapFooter />

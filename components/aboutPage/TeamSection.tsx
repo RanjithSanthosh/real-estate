@@ -1,59 +1,94 @@
-// // components/TeamSection.tsx
+
+
+
 // 'use client';
 
 // import Image from 'next/image';
-// import React, { useState } from 'react';
+// import React, { useState, useMemo } from 'react';
+// import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-// // Define a type for team member data
+// // --- 1. DATA AND TYPE DEFINITIONS ---
 // interface TeamMember {
 //   id: number;
 //   name: string;
 //   department: string;
-//   image: string; // Path to the image
-//   // You can add more details like 'role' if needed
+//   image: string;
 // }
 
-// // Dummy Data for Team Members
-// // In a real application, you might fetch this from an API
 // const allTeamMembers: TeamMember[] = [
 //   { id: 1, name: 'GOKUL', department: 'Sales', image: '/assets/teamM2.webp' },
-//   { id: 2, name: 'AASIN SAFI', department: 'Sales', image: '/assets/team/aasin.png' },
-//   { id: 3, name: 'VARUN. M', department: 'Sales', image: '/assets/team/varun.png' },
-//   { id: 4, name: 'DIVYAPRIYA K', department: 'Sales', image: '/assets/team/divyapriya.png' },
-//   { id: 5, name: 'ABBAS', department: 'Sales', image: '/assets/team/abbas.png' },
-//   { id: 6, name: 'DIVYA. S', department: 'Sales', image: '/assets/team/divya.png' },
-//   { id: 7, name: 'JOHN DOE', department: 'Support', image: '/assets/team/placeholder1.png' },
-//   { id: 8, name: 'JANE SMITH', department: 'Support', image: '/assets/team/placeholder2.png' },
-//   { id: 9, name: 'MIKE TYSON', department: 'Facilities', image: '/assets/team/placeholder3.png' },
-//   { id: 10, name: 'SARAH CONNOR', department: 'Head of support', image: '/assets/team/placeholder4.png' },
-//   { id: 11, name: 'DAVID LEE', department: 'Finance & Accounts', image: '/assets/team/placeholder5.png' },
-//   { id: 12, name: 'EMILY WONG', department: 'Human Resources', image: '/assets/team/placeholder6.png' },
-//   { id: 13, name: 'CHRIS EVANS', department: 'Head Of Sales', image: '/assets/team/placeholder7.png' },
-//   { id: 14, name: 'OLIVIA GREEN', department: 'Marketing', image: '/assets/team/placeholder8.png' },
-//   { id: 15, name: 'MARK JOHNSON', department: 'Videographer', image: '/assets/team/placeholder9.png' },
+//   { id: 2, name: 'AASIN SAFI', department: 'Sales', image: '/assets/teamM4.webp' },
+//   { id: 3, name: 'VARUN. M', department: 'Sales', image: '/assets/teamM3.webp' },
+//   { id: 4, name: 'DIVYAPRIYA K', department: 'Sales', image: '/assets/teamM4.webp' },
+//   { id: 5, name: 'ABBAS', department: 'Sales', image: '/assets/teamM4.webp' },
+//   { id: 6, name: 'DIVYA. S', department: 'Sales', image: '/assets/teamM2.webp' },
+//   { id: 7, name: 'JOHN DOE', department: 'Support', image: '/assets/teamM3.webp' },
+//   { id: 8, name: 'JANE SMITH', department: 'Support', image: '/assets/teamM4.webp' },
+//   { id: 9, name: 'MIKE TYSON', department: 'Facilities', image: '/assets/teamM4.webp' },
+//   { id: 10, name: 'SARAH CONNOR', department: 'Head of support', image: '/assets/teamM2.webp' },
+//   { id: 11, name: 'DAVID LEE', department: 'Finance & Accounts', image: '/assets/teamM4.webp' },
+//   { id: 12, name: 'EMILY WONG', department: 'Human Resources', image: '/assets/teamM2.webp' },
+//   { id: 13, name: 'CHRIS EVANS', department: 'Head Of Sales', image: '/assets/teamM3.webp' },
+//   { id: 14, name: 'OLIVIA GREEN', department: 'Marketing', image: '/assets/teamM4.webp' },
+//   { id: 15, name: 'MARK JOHNSON', department: 'Videographer', image: '/assets/teamM3.webp' },
 // ];
 
-// const ITEMS_PER_PAGE = 6; // As seen in the UI (3x2 grid)
+// const ITEMS_PER_PAGE = 6;
 
+// // --- 2. THE NEW, REDESIGNED TEAM MEMBER CARD COMPONENT ---
+// function TeamMemberCard({ member }: { member: TeamMember }) {
+//   return (
+//     <div className="relative rounded-lg shadow-lg overflow-hidden group h-80">
+//       {/* Background Image */}
+//       <Image
+//         src={member.image}
+//         alt={member.name}
+//         fill
+//         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+//         className="object-cover object-center w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-110"
+//       />
+      
+//       {/* Gradient Overlay for Text Readability */}
+//       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+
+//       {/* Text Content Overlay */}
+//       <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+//         <h3 className="text-2xl font-bold tracking-tight">{member.name}</h3>
+//         <p className="text-sm text-white/80">{member.department}</p>
+        
+//         {/* Hidden "View Details" link that appears on hover */}
+//         <div className="mt-4 opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+//           <a
+//             href="#"
+//             className="text-green-400 font-semibold text-sm hover:text-green-300"
+//           >
+//             View Details &rarr;
+//           </a>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// // --- 3. THE MAIN TEAM SECTION COMPONENT ---
 // export default function TeamSection() {
-//   const [activeTab, setActiveTab] = useState('Sales'); // Default active tab
+//   const [activeTab, setActiveTab] = useState('All');
 //   const [currentPage, setCurrentPage] = useState(1);
 
-//   // Get unique departments for tabs
-//   const departments = ['All', ...Array.from(new Set(allTeamMembers.map(member => member.department)))];
+//   const departments = useMemo(() => 
+//     ['All', ...Array.from(new Set(allTeamMembers.map(member => member.department)))], 
+//     []
+//   );
 
-//   // Filter members by active tab
-//   const filteredMembers = activeTab === 'All'
-//     ? allTeamMembers
-//     : allTeamMembers.filter(member => member.department === activeTab);
+//   const filteredMembers = useMemo(() => 
+//     activeTab === 'All'
+//       ? allTeamMembers
+//       : allTeamMembers.filter(member => member.department === activeTab),
+//     [activeTab]
+//   );
 
-//   // Calculate total pages for pagination
 //   const totalPages = Math.ceil(filteredMembers.length / ITEMS_PER_PAGE);
-
-//   // Get members for the current page
-//   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-//   const endIndex = startIndex + ITEMS_PER_PAGE;
-//   const membersToShow = filteredMembers.slice(startIndex, endIndex);
+//   const membersToShow = filteredMembers.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
 //   const handlePageChange = (page: number) => {
 //     if (page >= 1 && page <= totalPages) {
@@ -61,37 +96,8 @@
 //     }
 //   };
 
-//   const renderPaginationButtons = () => {
-//     const buttons = [];
-//     const maxVisiblePages = 5; // Adjust as needed
-//     const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-//     const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-//     for (let i = startPage; i <= endPage; i++) {
-//       buttons.push(
-//         <button
-//           key={i}
-//           className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-colors duration-200
-//             ${currentPage === i ? 'bg-green-500 text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-//           onClick={() => handlePageChange(i)}
-//         >
-//           {i}
-//         </button>
-//       );
-//     }
-//     return buttons;
-//   };
-
-//   // Helper function to create placeholder images if paths are missing
-//   const getImageUrl = (path: string, fallbackId: number) => {
-//     // Check if the path exists, otherwise return a placeholder
-//     // In a real app, you'd ensure images exist or handle errors
-//     // For now, let's assume the dummy paths are set up or generate
-//     return path || `https://via.placeholder.com/200?text=Team+Member+${fallbackId}`;
-//   };
-
 //   return (
-//     <section className="pb-16 md:pb-24 bg-gray-50">
+//     <section className="py-16 md:py-24 bg-gray-50">
 //       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
 //         <div className="text-center mb-12">
 //           <h2 className="text-4xl font-bold text-gray-800 mb-2">Meet Our Team</h2>
@@ -103,20 +109,14 @@
 //           {departments.map(dep => (
 //             <button
 //               key={dep}
-//               className={`relative px-3 py-2 text-sm font-medium transition-colors duration-300
-//                 ${activeTab === dep
-//                   ? 'text-green-600'
-//                   : 'text-gray-600 hover:text-green-600'
-//                 }`}
+//               className={`relative px-3 py-2 text-sm font-medium transition-colors duration-300 ${activeTab === dep ? 'text-green-600' : 'text-gray-600 hover:text-green-600'}`}
 //               onClick={() => {
 //                 setActiveTab(dep);
-//                 setCurrentPage(1); // Reset to first page when tab changes
+//                 setCurrentPage(1);
 //               }}
 //             >
 //               {dep}
-//               {activeTab === dep && (
-//                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-green-600 transform translate-y-full"></span>
-//               )}
+//               {activeTab === dep && <span className="absolute -bottom-4 left-0 w-full h-0.5 bg-green-600"></span>}
 //             </button>
 //           ))}
 //         </div>
@@ -125,28 +125,7 @@
 //         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
 //           {membersToShow.length > 0 ? (
 //             membersToShow.map(member => (
-//               <div key={member.id} className="bg-white rounded-lg shadow-lg overflow-hidden group">
-//                 <div className="relative w-full h-64 overflow-hidden">
-//                   <Image
-//                     src={getImageUrl(member.image, member.id)}
-//                     alt={member.name}
-//                     fill
-//                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-//                     style={{ objectFit: 'cover' }}
-//                     className="transition-transform duration-300 group-hover:scale-105"
-//                   />
-//                 </div>
-//                 <div className="p-6 text-center">
-//                   <h3 className="text-xl font-semibold text-gray-800 mb-1">{member.name}</h3>
-//                   <p className="text-sm text-gray-500 mb-3">{member.department}</p>
-//                   <a
-//                     href="#" // Replace with actual link to member's profile
-//                     className="text-green-600 hover:text-green-700 text-sm font-medium transition-colors duration-200"
-//                   >
-//                     View Details
-//                   </a>
-//                 </div>
-//               </div>
+//               <TeamMemberCard key={member.id} member={member} />
 //             ))
 //           ) : (
 //             <p className="col-span-full text-center text-gray-600 text-lg">No team members found for this department.</p>
@@ -157,19 +136,20 @@
 //         {totalPages > 1 && (
 //           <div className="flex justify-center items-center space-x-2">
 //             <button
-//               className="w-9 h-9 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+//               className="p-2 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200 disabled:opacity-50"
 //               onClick={() => handlePageChange(currentPage - 1)}
 //               disabled={currentPage === 1}
 //             >
-//               &larr;
+//               <ChevronLeft size={20} />
 //             </button>
-//             {renderPaginationButtons()}
+//             {/* Pagination numbers can be added here if needed */}
+//             <span className="text-sm text-gray-600 font-medium">Page {currentPage} of {totalPages}</span>
 //             <button
-//               className="w-9 h-9 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+//               className="p-2 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200 disabled:opacity-50"
 //               onClick={() => handlePageChange(currentPage + 1)}
 //               disabled={currentPage === totalPages}
 //             >
-//               &rarr;
+//               <ChevronRight size={20} />
 //             </button>
 //           </div>
 //         )}
@@ -181,11 +161,14 @@
 
 
 
+
+
 'use client';
 
 import Image from 'next/image';
 import React, { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 // --- 1. DATA AND TYPE DEFINITIONS ---
 interface TeamMember {
@@ -217,18 +200,30 @@ const ITEMS_PER_PAGE = 6;
 
 // --- 2. THE NEW, REDESIGNED TEAM MEMBER CARD COMPONENT ---
 function TeamMemberCard({ member }: { member: TeamMember }) {
+  const cardHoverVariants: Variants = {
+    rest: { backgroundPosition: "0% 50%" },
+    hover: { backgroundPosition: "100% 50%" },
+  };
+
   return (
-    <div className="relative rounded-lg shadow-lg overflow-hidden group h-80">
+    <motion.div
+      initial="rest"
+      whileHover="hover"
+      animate="rest"
+      className="relative rounded-lg shadow-lg overflow-hidden group h-80"
+    >
       {/* Background Image */}
-      <Image
-        src={member.image}
-        alt={member.name}
-        fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        className="object-cover object-center w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-110"
-      />
+      <motion.div className="absolute inset-0">
+        <Image
+          src={member.image}
+          alt={member.name}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover object-center w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-110"
+        />
+      </motion.div>
       
-      {/* Gradient Overlay for Text Readability */}
+      {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
 
       {/* Text Content Overlay */}
@@ -236,17 +231,24 @@ function TeamMemberCard({ member }: { member: TeamMember }) {
         <h3 className="text-2xl font-bold tracking-tight">{member.name}</h3>
         <p className="text-sm text-white/80">{member.department}</p>
         
-        {/* Hidden "View Details" link that appears on hover */}
-        <div className="mt-4 opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+        {/* Animated "View Details" link */}
+        <motion.div
+          variants={{
+            rest: { opacity: 0, y: 10 },
+            hover: { opacity: 1, y: 0 }
+          }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="mt-4"
+        >
           <a
             href="#"
             className="text-green-400 font-semibold text-sm hover:text-green-300"
           >
             View Details &rarr;
           </a>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -276,16 +278,42 @@ export default function TeamSection() {
     }
   };
 
+  // Animation Variants
+  const sectionVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.2 },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  };
+  
+  const cardVariants: Variants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.95 },
+  }
+
   return (
-    <section className="py-16 md:py-24 bg-gray-50">
+    <motion.section
+      variants={sectionVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
+      className="py-16 md:py-24 bg-gray-50"
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="text-center mb-12">
+        <motion.div variants={itemVariants} className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-800 mb-2">Meet Our Team</h2>
           <p className="text-gray-600">That makes us tick</p>
-        </div>
+        </motion.div>
 
         {/* Department Tabs */}
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-16 border-b border-gray-200 pb-4">
+        <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-16 border-b border-gray-200 pb-4">
           {departments.map(dep => (
             <button
               key={dep}
@@ -296,44 +324,76 @@ export default function TeamSection() {
               }}
             >
               {dep}
-              {activeTab === dep && <span className="absolute -bottom-4 left-0 w-full h-0.5 bg-green-600"></span>}
+              {activeTab === dep && (
+                <motion.span
+                  layoutId="active-tab-underline"
+                  className="absolute -bottom-4 left-0 w-full h-0.5 bg-green-600"
+                  transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                />
+              )}
             </button>
           ))}
-        </div>
+        </motion.div>
 
         {/* Team Member Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {membersToShow.length > 0 ? (
-            membersToShow.map(member => (
-              <TeamMemberCard key={member.id} member={member} />
-            ))
-          ) : (
-            <p className="col-span-full text-center text-gray-600 text-lg">No team members found for this department.</p>
-          )}
-        </div>
+        <motion.div
+          variants={itemVariants}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12 min-h-[500px]"
+        >
+          <AnimatePresence mode="wait">
+            {membersToShow.length > 0 ? (
+              membersToShow.map((member, i) => (
+                <motion.div
+                  key={member.id}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  transition={{ duration: 0.3, delay: i * 0.05 }}
+                  layout
+                >
+                  <TeamMemberCard member={member} />
+                </motion.div>
+              ))
+            ) : (
+              <motion.p
+                key="no-members-found"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="col-span-full text-center text-gray-600 text-lg"
+              >
+                No team members found for this department.
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center space-x-2">
-            <button
-              className="p-2 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+          <motion.div variants={itemVariants} className="flex justify-center items-center space-x-2">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-2 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
               <ChevronLeft size={20} />
-            </button>
-            {/* Pagination numbers can be added here if needed */}
+            </motion.button>
             <span className="text-sm text-gray-600 font-medium">Page {currentPage} of {totalPages}</span>
-            <button
-              className="p-2 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-2 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
               <ChevronRight size={20} />
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         )}
       </div>
-    </section>
+    </motion.section>
   );
 }

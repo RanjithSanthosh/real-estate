@@ -11,6 +11,12 @@ import DetailedFooter from '@/components/aboutPage/DetailedFooter';
 import SiteMapFooter from '@/components/homePage/SiteMapFooter';
 import BlogHeroSection from '@/components/blog/blogHeroSection';
 
+import GenericHero from "@/components/shared/GenericHero";
+import ContactHERO from "@/public/assets/aboutPage/AboutHERO.png"; // A different background image
+
+
+
+
 const inter = Inter({ subsets: ["latin"] });
 
 
@@ -31,11 +37,19 @@ export default function RootLayout({
 
   return (
     <>
-      <BlogHeroSection
+      {/* <BlogHeroSection
         onSearchClick={handleSearchClick}
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
+      /> */}
+
+              <GenericHero 
+        title="Blog" 
+        subtitle="Your Guide to Smarter Property Decisions" 
+        backgroundImage={ContactHERO}
+        activePage="Blog"
       />
+
       {children}
       {/* ✅ 2. Place your footer components here */}
       <SiteMapFooter />
