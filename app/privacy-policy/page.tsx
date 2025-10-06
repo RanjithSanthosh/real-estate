@@ -1,0 +1,104 @@
+import React from 'react';
+import Navbar from '@/components/shared/Navbar';
+import DetailedFooter from '@/components/aboutPage/DetailedFooter';
+import SiteMapFooter from '@/components/homePage/SiteMapFooter';
+import { blogsData, Blog } from '../data/blogs';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Palmtree } from 'lucide-react';
+
+// --- Reusable card for the "Latest in Blogs" sidebar ---
+function LatestBlogCard({ blog }: { blog: Blog }) {
+    return (
+        <Link href={`/blogs/${blog.slug}`} className="flex items-center gap-4 group">
+            <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                <Image 
+                    src={blog.image} 
+                    alt={blog.title} 
+                    fill 
+                    className="object-cover"
+                    sizes="80px"
+                />
+            </div>
+            <div>
+                <p className="flex items-center text-xs text-gray-500 mb-1">
+                    <Palmtree size={14} className="text-green-600 mr-1.5" />
+                    {blog.tag || 'Real Estate'}
+                </p>
+                <h4 className="font-semibold text-gray-800 leading-tight group-hover:text-green-600 transition-colors line-clamp-2">
+                    {blog.title}
+                </h4>
+                <p className="text-xs text-gray-400 mt-1">{blog.date}</p>
+            </div>
+        </Link>
+    );
+}
+
+// --- Main Page Component ---
+export default function TermsOfUsePage() {
+    const latestBlogs = blogsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
+
+    return (
+        <div className="bg-white">
+            <Navbar />
+            <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                    {/* Main Content Area */}
+                    <div className="lg:col-span-2">
+                        <h1 className="text-4xl md:text-5xl font-serif text-gray-900 font-bold mb-6">Terms of Use</h1>
+                        <p className="text-sm text-gray-500 mb-8">Version 1.0</p>
+                        
+                        <article className="prose lg:prose-lg max-w-none text-gray-600">
+                            <p>The Home Konnect® website located at https://homekonnect.com is a copyrighted work belonging to Home Konnect®. Certain features of the Site may be subject to additional guidelines, terms, or rules, which will be posted on the Site in connection with such features.</p>
+                            <p>All such additional terms, guidelines, and rules are incorporated by reference into these Terms.</p>
+                            <p>These Terms of Use described the legally binding terms and conditions that oversee your use of the Site. BY LOGGING INTO THE SITE, YOU ARE BEING COMPLIANT THAT THESE TERMS and you represent that you have the authority and capacity to enter into these Terms. YOU SHOULD BE AT LEAST 18 YEARS OF AGE TO ACCESS THE SITE. IF YOU DISAGREE WITH ALL OF THE PROVISION OF THESE TERMS, DO NOT LOG INTO AND/OR USE THE SITE.</p>
+                            <p>These terms require the use of arbitration Section 10.2 on an individual basis to resolve disputes and also limit the remedies available to you in the event of a dispute. These Terms of Use were created with the help of the Terms Of Use Generator.</p>
+                            
+                            <h2 className='font-serif'>Access to the Site</h2>
+                            <p><strong>Subject to these Terms.</strong> Company grants you a non-transferable, non-exclusive, revocable, limited license to access the Site solely for your own personal, noncommercial use.</p>
+                            <p><strong>Certain Restrictions.</strong> The rights approved to you in these Terms are subject to the following restrictions: (a) you shall not sell, rent, lease, transfer, assign, distribute, host, or otherwise commercially exploit the Site; (b) you shall not change, make derivative works of, disassemble, reverse compile or reverse engineer any part of the Site; (c) you shall not access the Site in order to build a similar or competitive website; and (d) except as expressly stated herein, no part of the Site may be copied, reproduced, distributed, republished, downloaded, displayed, posted or transmitted in any form or by any means unless otherwise indicated, any future release, update, or other addition to functionality of the Site shall be subject to these Terms. All copyright and other proprietary notices on the Site must be retained on all copies thereof.</p>
+                            <p>Company reserves the right to change, suspend, or cease the Site with or without notice to you. You approved that Company will not be held liable to you or any third-party for any change, interruption, or termination of the Site or any part.</p>
+                            <p><strong>No Support or Maintenance.</strong> You agree that Company will have no obligation to provide you with any support in connection with the Site.</p>
+                            <p>Excluding any User Content that you may provide, you are aware that all the intellectual property rights, including copyrights, patents, trademarks, and trade secrets, in the Site and its content are owned by Company or Company’s suppliers. Note that these Terms and access to the Site do not give you any rights, title or interest in or to any intellectual property rights, except for the limited access rights expressed in Section 2.1. Company and its suppliers reserve all rights not granted in these Terms.</p>
+
+                            <h2 className='font-serif'>Third-Party Links & Ads; Other Users</h2>
+                            <p><strong>Third-Party Links & Ads.</strong> The Site may contain links to third-party websites and services, and/or display advertisements for third-parties. Such Third-Party Links & Ads are not under the control of Company, and Company is not responsible for any Third-Party Links & Ads...</p>
+                            {/* Continue adding all other text sections as paragraphs and headings */}
+                            
+                            <h2 className='font-serif'>Copyright Policy.</h2>
+                            <p>Company respects the intellectual property of others and asks that users of our Site do the same...</p>
+                            
+                            <h2 className='font-serif'>General</h2>
+                            <p>These Terms are subject to occasional revision, and if we make any substantial changes, we may notify you by sending you an e-mail...</p>
+                            
+                            <h2 className='font-serif'>Contact Information</h2>
+                            <p><strong>Address:</strong> Home Konnect®, 5B, 5th Floor, New No. 205, Doshi Towers, Poonamallee High Road, Kilpauk, Chennai - 600010</p>
+                            <p><strong>Email:</strong> enquiry@homekonnect.com</p>
+                        </article>
+                    </div>
+
+                    {/* Sidebar: Latest in Blogs */}
+                    <aside>
+                        <div className="sticky top-24">
+                            <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">
+                                LATEST IN BLOGS
+                            </h2>
+                            <div className="space-y-6">
+                                {latestBlogs.map(blog => (
+                                    <LatestBlogCard key={blog.id} blog={blog} />
+                                ))}
+                            </div>
+                            <div className="mt-6 text-center">
+                                <Link href="/blogs" className="text-sm font-semibold text-green-600 hover:underline">
+                                    View More
+                                </Link>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </main>
+            <SiteMapFooter />
+            <DetailedFooter />
+        </div>
+    );
+}

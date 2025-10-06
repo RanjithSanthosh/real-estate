@@ -12,6 +12,7 @@ import Chatbot from "@/components/shared/Chatbot";
 import FloatingWhatsappButton from "@/components/shared/FloatingWhatsappButton"; // ✅ Import the new component
 import Link from "next/link";
 import Image from "next/image";
+import DisclaimerManager from "@/components/shared/DisclaimerManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,14 +60,18 @@ export default function RootLayout({
             <Chatbot />
           </div>
 
-
+          <DisclaimerManager />
         </UIProvider>
       </body>
     </html>
   );
 }
 
-// //  ${geistSans.variable} ${geistMono.variable}
+
+
+
+
+
 
 // import type { Metadata } from "next";
 // import {
@@ -82,6 +87,24 @@ export default function RootLayout({
 // import FloatingWhatsappButton from "@/components/shared/FloatingWhatsappButton"; // ✅ Import the new component
 // import Link from "next/link";
 // import Image from "next/image";
+// import DisclaimerManager from "@/components/shared/DisclaimerManager";
+
+
+// import { AppSidebar } from "@/components/app-sidebar"
+// import {
+//   Breadcrumb,
+//   BreadcrumbItem,
+//   BreadcrumbLink,
+//   BreadcrumbList,
+//   BreadcrumbPage,
+//   BreadcrumbSeparator,
+// } from "@/components/ui/breadcrumb"
+// import { Separator } from "@/components/ui/separator"
+// import {
+//   SidebarInset,
+//   SidebarProvider,
+//   SidebarTrigger,
+// } from "@/components/ui/sidebar"
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -117,11 +140,29 @@ export default function RootLayout({
 //       <body
 //         className={`${montserrat.className} ${geistSans.variable} ${geistMono.variable}  antialiased`}
 //       >
+//         <SidebarProvider>
+//       <AppSidebar />
+//       <SidebarInset>
 
-//  {children}
+//         <UIProvider>
+//           {children}
+//           <GlobalModal />
+//           {/* Floating buttons container: lower z-index, pointer-events-none if property list is open */}
+//           <div
+//             id="floating-buttons-container"
+//             className="fixed bottom-5 right-5 z-30 flex flex-col items-end gap-4"
+//           >
+//             <FloatingWhatsappButton />
+//             <Chatbot />
+//           </div>
+
+//           <DisclaimerManager />
+//         </UIProvider>
+//       </SidebarInset>
+//     </SidebarProvider>
 //       </body>
 //     </html>
 //   );
 // }
 
-//  ${geistSans.variable} ${geistMono.variable}
+
