@@ -17,3 +17,7 @@ export const sitemapData: SitemapLink[] = [
     { url: 'https://homekonnect.com/awards&amp;press', label: 'https://homekonnect.com/awards&amp;press' },
     { url: 'https://homekonnect.com/accreditations&amp;associations', label: 'https://homekonnect.com/accreditations&amp;associations' },
 ];
+
+
+
+export default sitemapData;
