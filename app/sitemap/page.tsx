@@ -3,7 +3,7 @@ import Navbar from '@/components/shared/Navbar';
 import DetailedFooter from '@/components/aboutPage/DetailedFooter';
 import SiteMapFooter from '@/components/homePage/SiteMapFooter';
 import { blogsData, Blog } from '../data/blogs';
-import { sitemapData } from '../data/sitemap'; // Import your new data
+import { sitemapData } from '../data/sitemap-data'; // Import your new data
 import Image from 'next/image';
 import Link from 'next/link';
 import { Palmtree } from 'lucide-react';
