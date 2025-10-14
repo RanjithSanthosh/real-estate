@@ -39,8 +39,6 @@ import { toast } from "react-hot-toast";
 import { Metadata } from 'next';
 
 
-
-
 export default function PropertyDetailPage({
   params,
 }: {
@@ -83,35 +81,70 @@ function PropertyHeader({
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const isFav = isFavorite(property.id);
 
-  // Enhanced share function in Meesho-like format
+  // Enhanced share function with image and metadata
   const handleShare = async () => {
     try {
-      // Create share data in the structured format like the image
-      const shareData = {
-        title: `Property Alert: ${property.name}`,
-        text: generateMeeshoStyleShareText(property, developer),
-        url: window.location.href,
-      };
+      // Generate the share text
+      const shareText = generateMeeshoStyleShareText(property, developer);
+      const shareUrl = window.location.href;
 
-      // Check if Web Share API is available
-      if (navigator.share) {
-        await navigator.share(shareData);
-        console.log("Property shared successfully in Meesho format!");
+      // Prepare the image file for sharing
+      const imageFile = await prepareImageForSharing(activeImage, property.name);
+
+      // Check if Web Share API supports files
+      if (navigator.share && navigator.canShare && imageFile && navigator.canShare({ files: [imageFile] })) {
+        // Share with image and text
+        await navigator.share({
+          title: `Property Alert: ${property.name}`,
+          text: shareText,
+          url: shareUrl,
+          files: [imageFile],
+        });
+        console.log("Property shared successfully with image!");
+      } 
+      // Check if basic Web Share API is available (without files)
+      else if (navigator.share) {
+        // Share without image
+        await navigator.share({
+          title: `Property Alert: ${property.name}`,
+          text: shareText,
+          url: shareUrl,
+        });
+        console.log("Property metadata shared successfully (without image)!");
       } else {
         // Fallback to clipboard
-        await handleClipboardFallback(shareData);
+        await handleClipboardFallback(shareText, shareUrl);
       }
     } catch (err) {
       // User cancelled the share or share failed
       if (err instanceof Error && err.name !== 'AbortError') {
         console.error('Share failed:', err);
         // Fallback to clipboard
-        await handleClipboardFallback({
-          title: `Property Alert: ${property.name}`,
-          text: generateMeeshoStyleShareText(property, developer),
-          url: window.location.href,
-        });
+        const shareText = generateMeeshoStyleShareText(property, developer);
+        await handleClipboardFallback(shareText, window.location.href);
       }
+    }
+  };
+
+  // Function to prepare image for sharing
+  const prepareImageForSharing = async (imageUrl: string, propertyName: string): Promise<File | null> => {
+    try {
+      // Fetch the image
+      const response = await fetch(imageUrl);
+      if (!response.ok) throw new Error('Failed to fetch image');
+      
+      const blob = await response.blob();
+      
+      // Create a File object from the blob
+      const file = new File([blob], 
+        `${propertyName.replace(/\s+/g, '_')}_property.jpg`, 
+        { type: blob.type || 'image/jpeg' }
+      );
+      
+      return file;
+    } catch (error) {
+      console.warn('Could not prepare image for sharing:', error);
+      return null;
     }
   };
 
@@ -134,23 +167,17 @@ function PropertyHeader({
     }
     
     shareText += `\nCheck this property now!\n`;
-    shareText += `Reply "STOP" to unsubscribe\n\n`;
+    // shareText += `Reply "STOP" to unsubscribe\n\n`;
     shareText += `---\n`;
     shareText += `View Property Details`;
 
     return shareText;
   };
 
-  // Alternative concise version (like the exact Meesho format)
-  const generateConciseShareText = (property: Property) => {
-    return `Property Alert: ${property.name} at ${property.location} is available for ${property.priceRange}. \n\nCheck this amazing opportunity!\n\nView Details: ${window.location.href}\n\nReply "STOP" to unsubscribe`;
-  };
-
   // Clipboard fallback function
-  const handleClipboardFallback = async (shareData: { title: string; text: string; url: string }) => {
+  const handleClipboardFallback = async (shareText: string, shareUrl: string) => {
     try {
-      // Combine all data for clipboard
-      const clipboardText = `${shareData.title}\n\n${shareData.text}\n\n${shareData.url}`;
+      const clipboardText = `Property Alert: ${property.name}\n\n${shareText}\n\n${shareUrl}`;
       
       await navigator.clipboard.writeText(clipboardText);
       toast.success("📋 Property details copied to clipboard!", {
@@ -166,7 +193,7 @@ function PropertyHeader({
       console.error('Clipboard fallback failed:', err);
       
       // Ultimate fallback - show share data in alert
-      const shareContent = `${shareData.title}\n\n${shareData.text}\n\n${shareData.url}`;
+      const shareContent = `Property Alert: ${property.name}\n\n${shareText}\n\n${shareUrl}`;
       alert(`Share this property:\n\n${shareContent}`);
     }
   };
@@ -174,7 +201,7 @@ function PropertyHeader({
   // Enhanced share with loading state
   const handleShareWithFallbacks = async () => {
     // Show loading state
-    toast.loading("Preparing property details...", { id: "share" });
+    toast.loading("Preparing property details with image...", { id: "share" });
 
     try {
       await handleShare();
@@ -227,7 +254,7 @@ function PropertyHeader({
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white transition shadow-md"
-              title="Share property details"
+              title="Share property details with image"
             >
               <Share2 size={20} />
             </motion.button>
