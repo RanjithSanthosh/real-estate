@@ -559,6 +559,7 @@
 
 
 
+
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -584,7 +585,7 @@ import { useUI } from "../../app/context/UIContext";
 import heroImage from "./assets/Hero.png";
 import logoImage from "./assets/logo.png";
 
-// --- Constants (Moved outside the component for performance) ---
+// --- Constants ---
 const CITIES = ["Mumbai", "Delhi", "Bangalore", "Chennai", "Kolkata"];
 const PROPERTIES = [
   "Luxury Villa",
@@ -612,14 +613,41 @@ const dropdownVariants: Variants = {
   exit: { opacity: 0, y: -10, scale: 0.95 },
 };
 
-// --- Custom Hook for handling clicks outside an element ---
+const heroTextContainerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.2, delayChildren: 0.3 },
+  },
+};
+
+const heroTextItemVariants: Variants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { duration: 0.5 } },
+};
+
+const searchButtonContainerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 1.5 },
+  },
+};
+
+const searchButtonVariants: Variants = {
+  hidden: { scale: 0, opacity: 0 },
+  visible: { scale: 1, opacity: 1 },
+};
+
+// --- Custom Hook for handling clicks outside multiple elements ---
 const useClickOutside = (
-  ref: React.RefObject<HTMLElement>,
+  refs: React.RefObject<HTMLElement>[],
   handler: () => void,
 ) => {
   useEffect(() => {
     const listener = (event: MouseEvent | TouchEvent) => {
-      if (!ref.current || ref.current.contains(event.target as Node)) {
+      // If the click is inside any of the provided refs, do nothing
+      if (refs.some(ref => ref.current?.contains(event.target as Node))) {
         return;
       }
       handler();
@@ -630,51 +658,165 @@ const useClickOutside = (
       document.removeEventListener("mousedown", listener);
       document.removeEventListener("touchstart", listener);
     };
-  }, [ref, handler]);
+  }, [refs, handler]);
 };
 
 // --- Mobile Navigation Component ---
-function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const mobileNavVariants: Variants = {
-    hidden: { x: "100%" },
-    visible: { x: 0, transition: { type: "tween", ease: "easeInOut" } },
-    exit: { x: "100%", transition: { type: "tween", ease: "easeInOut" } },
-  };
+function MobileNav({ 
+  isOpen, 
+  onClose,
+  selectedCity,
+  onCityChange,
+  openConsultationModal
+}: { 
+  isOpen: boolean; 
+  onClose: () => void;
+  selectedCity: string;
+  onCityChange: (city: string) => void;
+  openConsultationModal: () => void;
+}) {
+  const [isResourcesOpen, setIsResourcesOpen] = useState(false);
+  const [isCitiesOpen, setIsCitiesOpen] = useState(false);
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          variants={mobileNavVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          className="fixed top-0 right-0 h-full w-full max-w-sm bg-gray-800/90 backdrop-blur-sm z-40 p-6 flex flex-col lg:hidden"
-        >
-          <div className="flex justify-between items-center mb-10">
-            <Image src={logoImage} alt="Home Konnect Logo" width={150} />
-            <button onClick={onClose} className="text-white">
-              <X size={28} />
-            </button>
-          </div>
-          <nav className="flex flex-col gap-6 text-white text-lg font-medium">
-            <Link href="/home" onClick={onClose}>Home</Link>
-            <Link href="/about" onClick={onClose}>About</Link>
-            <Link href="/contact" onClick={onClose}>Contact Us</Link>
-            <Link href="/blogs" onClick={onClose}>Blog</Link>
-            <Link href="/careers" onClick={onClose}>Careers</Link>
-            <details>
-              <summary className="cursor-pointer">Resources</summary>
-              <ul className="pl-4 mt-2 flex flex-col gap-3 text-base">
-                {RESOURCE_LINKS.map(link => (
-                  <li key={link.href}>
-                    <Link href={link.href} onClick={onClose} className="hover:text-green-300">{link.label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </details>
-          </nav>
-        </motion.div>
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={onClose}
+          />
+          
+          {/* Sidebar */}
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "tween", ease: "easeOut", duration: 0.3 }}
+            className="fixed top-0 right-0 h-full w-80 max-w-full bg-white z-50 flex flex-col lg:hidden"
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center p-6 border-b">
+              <Image src={logoImage} alt="Home Konnect Logo" width={140} height={32} />
+              <button onClick={onClose} className="p-2">
+                <X size={24} className="text-gray-600" />
+              </button>
+            </div>
+
+            {/* Navigation Content */}
+            <div className="flex-1 overflow-y-auto">
+              <nav className="flex flex-col p-6">
+                {/* Cities Dropdown */}
+                <div className="mb-6">
+                  <button
+                    onClick={() => setIsCitiesOpen(!isCitiesOpen)}
+                    className="flex justify-between items-center w-full text-left text-lg font-semibold text-gray-800 mb-2"
+                  >
+                    <span>{selectedCity}</span>
+                    <ChevronDown 
+                      size={20} 
+                      className={`transition-transform duration-300 ${isCitiesOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  <AnimatePresence>
+                    {isCitiesOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pl-4 space-y-2">
+                          {CITIES.map((city) => (
+                            <button
+                              key={city}
+                              onClick={() => {
+                                onCityChange(city);
+                                setIsCitiesOpen(false);
+                              }}
+                              className="block w-full text-left py-2 text-gray-600 hover:text-green-600"
+                            >
+                              {city}
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Main Links */}
+                <Link href="/home" onClick={onClose} className="py-3 text-lg font-semibold text-gray-800 border-b">
+                  Home
+                </Link>
+                <Link href="/about" onClick={onClose} className="py-3 text-lg font-semibold text-gray-800 border-b">
+                  About
+                </Link>
+                <Link href="/contact" onClick={onClose} className="py-3 text-lg font-semibold text-gray-800 border-b">
+                  Contact Us
+                </Link>
+                <Link href="/blogs" onClick={onClose} className="py-3 text-lg font-semibold text-gray-800 border-b">
+                  Blog
+                </Link>
+                <Link href="/careers" onClick={onClose} className="py-3 text-lg font-semibold text-gray-800 border-b">
+                  Careers
+                </Link>
+
+                {/* Resources Dropdown */}
+                <div className="border-b">
+                  <button
+                    onClick={() => setIsResourcesOpen(!isResourcesOpen)}
+                    className="flex justify-between items-center w-full py-3 text-left text-lg font-semibold text-gray-800"
+                  >
+                    <span>Resources</span>
+                    <ChevronDown 
+                      size={20} 
+                      className={`transition-transform duration-300 ${isResourcesOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  <AnimatePresence>
+                    {isResourcesOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pl-4 space-y-2 pb-3">
+                          {RESOURCE_LINKS.map((link) => (
+                            <Link
+                              key={link.href}
+                              href={link.href}
+                              onClick={onClose}
+                              className="block py-2 text-gray-600 hover:text-green-600"
+                            >
+                              {link.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Call Us Button for Mobile */}
+                <button
+                  onClick={() => {
+                    openConsultationModal();
+                    onClose();
+                  }}
+                  className="flex items-center justify-center gap-2 mt-6 bg-green-500 text-white py-3 px-6 rounded-full font-semibold"
+                >
+                  <Phone size={20} /> Call Us
+                </button>
+              </nav>
+            </div>
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
@@ -690,7 +832,7 @@ interface HeroProps {
 export default function Hero({ onSearchClick, searchTerm, onSearchChange }: HeroProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [selectedCity, setSelectedCity] = useState("All Cities");
+  const [selectedCity, setSelectedCity] = useState("Chennai");
 
   const dropdownRefs = {
     navbarCity: useRef<HTMLDivElement>(null),
@@ -698,64 +840,95 @@ export default function Hero({ onSearchClick, searchTerm, onSearchChange }: Hero
     property: useRef<HTMLDivElement>(null),
     resources: useRef<HTMLDivElement>(null),
   };
-
-  const {
-    openLoginModal,
-    openFilterModal,
-    openConsultationModal,
-    isConsultationModalOpen,
-    closeConsultationModal,
-  } = useUI();
   
   const searchBarRef = useRef<HTMLDivElement>(null);
+  const {
+    openLoginModal, 
+    openFilterModal, 
+    openConsultationModal, 
+    isConsultationModalOpen, 
+    closeConsultationModal, 
+    openOfferModal
+  } = useUI();
 
-  // Close dropdowns when clicking outside
   const closeAllDropdowns = useCallback(() => setActiveDropdown(null), []);
-  useClickOutside(dropdownRefs.navbarCity, closeAllDropdowns);
-  useClickOutside(dropdownRefs.searchBarCity, closeAllDropdowns);
-  useClickOutside(dropdownRefs.property, closeAllDropdowns);
-  useClickOutside(dropdownRefs.resources, closeAllDropdowns);
+  useClickOutside(Object.values(dropdownRefs), closeAllDropdowns);
 
   const handleDropdownToggle = (dropdownName: string) => {
     setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
+  };
+
+  const handleCityChange = (city: string) => {
+    setSelectedCity(city);
+    closeAllDropdowns();
   };
   
   const handleScrollToSearch = () => {
     onSearchClick();
     setTimeout(() => {
-      searchBarRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      searchBarRef.current?.scrollIntoView({ 
+        behavior: "smooth", 
+        block: "center" 
+      });
     }, 100);
   };
 
+  // Close mobile menu when window is resized to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <div className="relative h-[85vh] min-h-[650px] lg:h-screen">
-      {/* Background Image */}
+    <div className="relative h-[70vh] min-h-[600px] lg:h-screen">
+      {/* Background */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
           className="absolute inset-0"
-          animate={{ scale: [1, 1.1], rotate: [0, -1] }}
-          transition={{ duration: 15, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+          animate={{ scale: [1, 1.1], rotate: [0, -1], x: [0, -30] }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            repeatType: "mirror",
+            ease: "easeInOut",
+          }}
         >
           <Image
             src={heroImage}
             alt="Beautiful modern house"
             fill
             style={{ objectFit: "cover" }}
+            className="z-0"
             priority
           />
         </motion.div>
       </div>
+
       <div className="absolute inset-0 bg-black/50 z-10" />
 
+      {/* Consultation Modal */}
       {isConsultationModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <ConsultationModal onClose={closeConsultationModal} />
         </div>
       )}
 
-      <MobileNav isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      {/* Mobile Navigation */}
+      <MobileNav 
+        isOpen={isMenuOpen} 
+        onClose={() => setIsMenuOpen(false)}
+        selectedCity={selectedCity}
+        onCityChange={handleCityChange}
+        openConsultationModal={openConsultationModal}
+      />
 
-      {/* Header */}
+      {/* Desktop Navbar */}
       <header className="absolute top-0 left-0 right-0 z-30">
         <motion.nav
           initial={{ y: -20, opacity: 0 }}
@@ -763,82 +936,181 @@ export default function Hero({ onSearchClick, searchTerm, onSearchChange }: Hero
           transition={{ duration: 0.5 }}
           className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center text-white"
         >
-          <Link href="/">
-            <Image src={logoImage} alt="Home Konnect Logo" width={180} height={40} />
+          {/* Logo */}
+          <Link href="/" className="flex-shrink-0">
+            <Image 
+              src={logoImage} 
+              alt="Home Konnect Logo" 
+              width={160} 
+              height={36}
+              className="w-32 sm:w-40"
+            />
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8 font-medium">
-            <div ref={dropdownRefs.navbarCity} className="relative">
-              <button onClick={() => handleDropdownToggle("navbarCity")} className="flex items-center gap-2">
+            {/* Cities Dropdown */}
+            <motion.div
+              whileHover={{ y: -2 }}
+              className="relative"
+              ref={dropdownRefs.navbarCity}
+            >
+              <button
+                onClick={() => handleDropdownToggle("navbarCity")}
+                className="flex items-center gap-2 hover:text-green-300 transition-colors"
+              >
                 {selectedCity}
-                <motion.div animate={{ rotate: activeDropdown === "navbarCity" ? 180 : 0 }}>
+                <motion.div
+                  animate={{ rotate: activeDropdown === "navbarCity" ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <ChevronDown size={16} />
                 </motion.div>
               </button>
               <AnimatePresence>
                 {activeDropdown === "navbarCity" && (
-                  <motion.ul variants={dropdownVariants} initial="hidden" animate="visible" exit="exit" className="absolute top-full mt-2 w-48 bg-white text-gray-700 rounded-lg shadow-xl z-40 py-1">
-                    {CITIES.map((city) => (
-                      <li key={city}>
-                        <button
-                          onClick={() => {
-                            setSelectedCity(city);
-                            closeAllDropdowns();
-                          }}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                        >
-                          {city}
-                        </button>
-                      </li>
-                    ))}
-                  </motion.ul>
+                  <motion.div
+                    variants={dropdownVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    transition={{ duration: 0.2 }}
+                    className="absolute top-full mt-2 w-48 bg-white rounded-lg shadow-xl z-40 origin-top"
+                  >
+                    <ul className="py-1 text-gray-700">
+                      {CITIES.map((city) => (
+                        <li key={city}>
+                          <button
+                            onClick={() => handleCityChange(city)}
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+                          >
+                            {city}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
                 )}
               </AnimatePresence>
-            </div>
-            <Link href="/home" className="bg-white text-gray-700 px-4 py-2 rounded-3xl">Home</Link>
-            <Link href="/about" className="hover:text-green-300">About</Link>
-            <Link href="/contact" className="hover:text-green-300">Contact Us</Link>
-             <Link href="/blogs" className="hover:text-green-300">Blog</Link>
-            <Link href="/careers" className="hover:text-green-300">Careers</Link>
-            <div ref={dropdownRefs.resources} className="relative">
-                <button onClick={() => handleDropdownToggle('resources')} className="flex items-center gap-2 hover:text-green-300">
-                    Resources
-                    <motion.div animate={{ rotate: activeDropdown === 'resources' ? 180 : 0 }} transition={{ duration: 0.3 }}>
-                        <ChevronDown size={16} />
-                    </motion.div>
-                </button>
-                <AnimatePresence>
-                    {activeDropdown === 'resources' && (
-                        <motion.ul variants={dropdownVariants} initial="hidden" animate="visible" exit="exit" className="absolute top-full right-0 mt-2 w-56 bg-white text-gray-700 rounded-lg shadow-xl z-40 py-1">
-                            {RESOURCE_LINKS.map((link) => (
-                                <li key={link.label}>
-                                    <Link href={link.href} onClick={closeAllDropdowns} className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                                        {link.label}
-                                    </Link>
-                                </li>
-                            ))}
-                        </motion.ul>
-                    )}
-                </AnimatePresence>
-            </div>
+            </motion.div>
+
+            <Link
+              href="/home"
+              className="bg-white text-gray-700 px-4 py-2 rounded-3xl hover:bg-gray-100 transition-colors"
+            >
+              Home
+            </Link>
+            <Link href="/about" className="hover:text-green-300 transition-colors">
+              About
+            </Link>
+            <Link href="/contact" className="hover:text-green-300 transition-colors">
+              Contact Us
+            </Link>
+            <Link href="/blogs" className="hover:text-green-300 transition-colors">
+              Blog
+            </Link>
+            <Link href="/careers" className="hover:text-green-300 transition-colors">
+              Careers
+            </Link>
+
+            {/* Resources Dropdown */}
+            <motion.div
+              whileHover={{ y: -2 }}
+              className="relative"
+              ref={dropdownRefs.resources}
+            >
+              <button
+                onClick={() => handleDropdownToggle("resources")}
+                className="flex items-center gap-2 hover:text-green-300 transition-colors"
+              >
+                Resources
+                <motion.div
+                  animate={{ rotate: activeDropdown === "resources" ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ChevronDown size={16} />
+                </motion.div>
+              </button>
+              <AnimatePresence>
+                {activeDropdown === "resources" && (
+                  <motion.div
+                    variants={dropdownVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="absolute top-full right-0 mt-2 w-56 bg-white rounded-lg shadow-xl z-40 origin-top-right"
+                  >
+                    <ul className="py-1 text-gray-700">
+                      {RESOURCE_LINKS.map((link) => (
+                        <li key={link.label}>
+                          <Link
+                            href={link.href}
+                            onClick={closeAllDropdowns}
+                            className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+                          >
+                            {link.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </div>
 
-          {/* Header Actions */}
+          {/* Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-4">
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={openConsultationModal} className="hidden sm:flex items-center gap-2 border px-4 py-2 rounded-full font-medium">
+            <motion.button
+              onClick={openConsultationModal}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="hidden sm:flex items-center gap-2 border border-white px-4 py-2 rounded-3xl font-medium hover:bg-white/10 transition-colors"
+            >
               <Phone size={16} /> Call Us
             </motion.button>
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={handleScrollToSearch} className="hidden md:block p-2 hover:bg-white/20 rounded-full">
+
+            <motion.button
+              onClick={openOfferModal}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"
+            >
+              <Gift size={20} />
+            </motion.button>
+
+            <motion.button
+              onClick={handleScrollToSearch}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"
+            >
               <Search size={20} />
             </motion.button>
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="hidden md:block p-2 hover:bg-white/20 rounded-full">
-              <Link href="/favorites"><Heart size={20} /></Link>
+
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"
+            >
+              <Link href="/favorites">
+                <Heart size={20} />
+              </Link>
             </motion.button>
-            <motion.button onClick={openLoginModal} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+
+            <motion.button
+              onClick={openLoginModal}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-2 hover:bg-white/20 rounded-full transition-colors"
+            >
               <User size={22} />
             </motion.button>
-            <button onClick={() => setIsMenuOpen(true)} className="lg:hidden p-2">
+
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="lg:hidden p-2 hover:bg-white/20 rounded-full transition-colors"
+            >
               <Menu size={24} />
             </button>
           </div>
@@ -847,95 +1119,174 @@ export default function Hero({ onSearchClick, searchTerm, onSearchChange }: Hero
 
       {/* Hero Content */}
       <div className="relative z-20 flex flex-col items-center justify-center h-full text-center text-white px-4">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { staggerChildren: 0.2, delayChildren: 0.3 } }} className="flex flex-col items-center">
-          <motion.p variants={heroTextItemVariants} className="text-green-400 font-semibold text-lg mb-2">0% Brokerage - 100% Delight</motion.p>
-          <motion.h1 variants={heroTextItemVariants} className="text-4xl md:text-6xl font-bold leading-tight mt-2 mb-2">Connecting To Your <br /> Dream Home</motion.h1>
-          <motion.p variants={heroTextItemVariants} className="text-lg text-gray-200 font-semibold">Chennai's Most Trusted Real Estate Agency</motion.p>
+        <motion.div
+          variants={heroTextContainerVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col items-center max-w-4xl"
+        >
+          <motion.p
+            variants={heroTextItemVariants}
+            className="text-green-400 font-semibold text-lg mb-2"
+          >
+            0% Brokerage - 100% Delight
+          </motion.p>
+          <motion.h1
+            variants={heroTextItemVariants}
+            className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mt-2 mb-2"
+          >
+            Connecting To Your <br /> Dream Home
+          </motion.h1>
+          <motion.p
+            variants={heroTextItemVariants}
+            className="text-lg md:text-xl text-gray-200 font-semibold mt-4"
+          >
+            Chennai's Most Trusted Real Estate Agency
+          </motion.p>
         </motion.div>
       </div>
-      
-      {/* Search Bar */}
-      <div ref={searchBarRef} className="absolute -bottom-24 md:-bottom-16 left-1/2 -translate-x-1/2 z-20 w-[90%] lg:w-3/4 max-w-4xl">
-        <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ opacity: { duration: 0.6, delay: 1.2 } }}>
-          <div className="bg-white rounded-2xl md:rounded-full shadow-2xl p-3 flex flex-col md:flex-row items-center gap-2 relative">
-            <div ref={dropdownRefs.searchBarCity} className="relative flex items-center gap-2 w-full md:w-auto md:border-r pr-4 pl-4 py-2 md:py-0 cursor-pointer">
-              <MapPin className="text-gray-400" size={20} />
-              <button onClick={() => handleDropdownToggle("searchBarCity")} className="font-semibold text-gray-700 flex items-center gap-1">
+
+      {/* Search Bar Section */}
+      <div
+        ref={searchBarRef}
+        className="absolute -bottom-20 left-1/2 -translate-x-1/2 z-20 w-[90%] lg:w-3/4 max-w-4xl"
+      >
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{
+            y: { duration: 0.8, ease: "easeOut" },
+            opacity: { duration: 0.6, delay: 1.2 },
+          }}
+        >
+          <div className="bg-white rounded-2xl md:rounded-full shadow-2xl p-4 flex flex-col md:flex-row items-center gap-3 relative">
+            {/* City Dropdown */}
+            <div
+              ref={dropdownRefs.searchBarCity}
+              className="relative flex items-center gap-2 w-full md:w-auto md:border-r border-gray-200 pr-4 pl-3 py-2 md:py-0 cursor-pointer"
+            >
+              <MapPin className="text-gray-400 flex-shrink-0" size={20} />
+              <button
+                onClick={() => handleDropdownToggle("searchBarCity")}
+                className="font-semibold text-gray-700 flex items-center gap-1 text-sm md:text-base"
+              >
                 {selectedCity}
                 <ChevronDown size={16} className="text-gray-400" />
               </button>
+
               <AnimatePresence>
                 {activeDropdown === "searchBarCity" && (
-                  <motion.ul variants={dropdownVariants} initial="hidden" animate="visible" exit="exit" className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-lg w-40 z-30 py-1">
-                    {CITIES.map((city) => (
-                      <li key={city}>
-                        <button
-                          onClick={() => {
-                            setSelectedCity(city);
-                            closeAllDropdowns();
-                          }}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-                        >
-                          {city}
-                        </button>
-                      </li>
-                    ))}
-                  </motion.ul>
+                  <motion.div
+                    variants={dropdownVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-lg w-40 z-30"
+                  >
+                    <ul className="text-gray-700 text-sm py-1">
+                      {CITIES.map((city) => (
+                        <li key={city}>
+                          <button
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                            onClick={() => handleCityChange(city)}
+                          >
+                            {city}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
-            <div ref={dropdownRefs.property} className="relative flex-grow w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            {/* Property Search Input */}
+            <div
+              ref={dropdownRefs.property}
+              className="relative flex-grow w-full"
+            >
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={20}
+              />
               <input
                 type="text"
                 placeholder="Search by property name or type..."
-                className="w-full pl-10 pr-4 py-2 bg-transparent border-none focus:ring-0 text-gray-800"
+                className="w-full pl-10 pr-4 py-3 md:py-2 bg-transparent border-none focus:ring-0 text-gray-800 placeholder:text-gray-500 text-sm md:text-base"
                 value={searchTerm}
                 onFocus={() => handleDropdownToggle("property")}
                 onChange={(e) => onSearchChange(e.target.value)}
               />
+
               <AnimatePresence>
                 {activeDropdown === "property" && (
-                  <motion.ul variants={dropdownVariants} initial="hidden" animate="visible" exit="exit" className="absolute top-full left-0 w-full bg-white shadow-lg rounded-lg mt-2 z-30 py-1">
-                    {PROPERTIES.map((p) => (
-                      <li key={p}>
-                        <button
-                          onClick={() => {
-                            onSearchChange(p);
-                            closeAllDropdowns();
-                          }}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-                        >
-                          {p}
-                        </button>
-                      </li>
-                    ))}
-                  </motion.ul>
+                  <motion.div
+                    variants={dropdownVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="absolute top-full left-0 w-full bg-white shadow-lg rounded-lg mt-2 z-30 max-h-60 overflow-y-auto"
+                  >
+                    <ul className="text-gray-700 text-sm py-1">
+                      {PROPERTIES.map((p) => (
+                        <li key={p}>
+                          <button
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                            onClick={() => {
+                              onSearchChange(p);
+                              closeAllDropdowns();
+                            }}
+                          >
+                            {p}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
-            <div className="flex items-center gap-2 p-2 md:p-0 w-full md:w-auto justify-evenly">
-              <motion.button onClick={openFilterModal} whileHover={{ scale: 1.1 }} className="p-3 bg-green-500 hover:bg-green-600 text-white rounded-full">
+            {/* Action Buttons */}
+            <motion.div
+              variants={searchButtonContainerVariants}
+              initial="hidden"
+              animate="visible"
+              className="flex items-center gap-2 w-full md:w-auto justify-center md:justify-start"
+            >
+              <motion.button
+                variants={searchButtonVariants}
+                onClick={openFilterModal}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors flex-shrink-0"
+                title="Filters"
+              >
                 <SlidersHorizontal size={20} />
               </motion.button>
-              <motion.button whileHover={{ scale: 1.1 }} className="p-3 bg-green-500 hover:bg-green-600 text-white rounded-full">
+              <motion.button
+                variants={searchButtonVariants}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors flex-shrink-0"
+                title="Settings"
+              >
                 <Settings2 size={20} />
               </motion.button>
-              <motion.button onClick={onSearchClick} whileHover={{ scale: 1.1 }} className="p-3 bg-green-500 hover:bg-green-600 text-white rounded-full">
+              <motion.button
+                variants={searchButtonVariants}
+                onClick={onSearchClick}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors flex-shrink-0"
+                title="Search"
+              >
                 <Search size={20} />
               </motion.button>
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </div>
     </div>
   );
 }
-
-// Added these variants here for clarity in the Hero Content section
-const heroTextItemVariants: Variants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { duration: 0.5 } },
-};
