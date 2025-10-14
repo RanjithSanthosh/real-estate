@@ -23,7 +23,7 @@ export default function FavoritesPage() {
         title="Favorites"
         subtitle="Your handpicked collection of dream homes"
         backgroundImage={heroImage}
-        activePage="About" // Set this to a non-active state or a new 'Favorites' state
+         // Set this to a non-active state or a new 'Favorites' state
       />
       <main className="py-16">
         {favoritedProperties.length > 0 ? (

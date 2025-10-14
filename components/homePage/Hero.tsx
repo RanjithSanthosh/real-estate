@@ -2230,11 +2230,15 @@ export default function Hero({
               <Search size={20} />
             </motion.button>
             <motion.button
+            
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               className="hidden md:block p-2 hover:bg-white/20 rounded-full"
             >
+              
+               <Link href="/favorites" className="hover:text-green-300">
               <Heart size={20} />
+            </Link>
             </motion.button>
             <motion.button
               onClick={openLoginModal}
