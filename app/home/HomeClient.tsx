@@ -24,6 +24,7 @@ import SiteMapFooter from '@/components/homePage/SiteMapFooter';
 import DetailedFooter from '@/components/aboutPage/DetailedFooter';
 import FilterModal from '@/components/shared/FilterModal';
 import OfferModal from '@/components/shared/OfferModal';
+import EndToEndSolutions from '@/components/homePage/EndToEndSolutions';
 
 
 
@@ -150,6 +151,7 @@ export default function HomeClient() {
           </>
         ) : (
           <>
+            <EndToEndSolutions />
             <WhyChooseUs />
             <FeaturedProjects />
             <AdvantageSection />

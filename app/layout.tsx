@@ -13,6 +13,8 @@ import FloatingWhatsappButton from "@/components/shared/FloatingWhatsappButton";
 import Link from "next/link";
 import Image from "next/image";
 import DisclaimerManager from "@/components/shared/DisclaimerManager";
+import { FavoritesProvider } from "./context/FavoritesContext"; // ✅ Import the FavoritesProvider
+import { Toaster } from 'react-hot-toast';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +51,9 @@ export default function RootLayout({
         className={`${montserrat.className} ${geistSans.variable} ${geistMono.variable}  antialiased`}
       >
         <UIProvider>
+           <FavoritesProvider>
+             <Toaster /> 
+
           {children}
           <GlobalModal />
           {/* Floating buttons container: lower z-index, pointer-events-none if property list is open */}
@@ -61,6 +66,7 @@ export default function RootLayout({
           </div>
 
           <DisclaimerManager />
+           </FavoritesProvider>
         </UIProvider>
       </body>
     </html>
