@@ -28,12 +28,9 @@ import {
 import DetailedFooter from "@/components/aboutPage/DetailedFooter";
 import SiteMapFooter from "@/components/homePage/SiteMapFooter";
 
-import { useFavorites } from '../../context/FavoritesContext';
-import { toast } from 'react-hot-toast';
+import { useFavorites } from "../../context/FavoritesContext";
+import { toast } from "react-hot-toast";
 // --- MAIN PAGE COMPONENT ---
-
-
-
 
 export default function PropertyDetailPage({
   params,
@@ -68,31 +65,60 @@ export default function PropertyDetailPage({
 // --- SUB-COMPONENT: PROPERTY HEADER ---
 function PropertyHeader({ property }: { property: Property }) {
   const [activeImage, setActiveImage] = useState(property.images[0]);
-    const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const isFav = isFavorite(property.id);
 
+  const handleShare = async () => {
+    const shareData = {
+      title: property.name,
+      text: `Check out this amazing property: ${property.name} by ${property.developer}.`,
+      url: window.location.href,
+    };
 
-     const handleFavoriteToggle = (e: React.MouseEvent) => {
-    e.preventDefault(); 
+    // Check if the Web Share API is available in the browser
+    if (navigator.share) {
+      try {
+        // If available, use the native share dialog
+        await navigator.share(shareData);
+        console.log("Property shared successfully!");
+      } catch (err) {
+        // The user might cancel the share action, so we catch the error
+        console.log("Share action was cancelled or failed", err);
+      }
+    } else {
+      // --- FALLBACK ---
+      // If the API is not available, copy the link to the clipboard
+      try {
+        await navigator.clipboard.writeText(shareData.url);
+        toast.success("Property link copied to clipboard!");
+      } catch (err) {
+        console.error("Failed to copy link: ", err);
+        toast.error("Could not copy the link.");
+      }
+    }
+  };
+
+  const handleFavoriteToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
-    
+
     // Step 2: Use the toast function
     if (isFav) {
       removeFavorite(property.id);
-      toast('Property removed from favorites', {
-        icon: '💔',
+      toast("Property removed from favorites", {
+        icon: "💔",
       });
     } else {
       addFavorite(property.id);
       // This creates a success toast that looks similar to your image
-      toast.success('Property added to favorites', {
+      toast.success("Property added to favorites", {
         style: {
-          background: '#28a745', // Green background
-          color: '#ffffff',     // White text
+          background: "#28a745", // Green background
+          color: "#ffffff", // White text
         },
         iconTheme: {
-          primary: '#ffffff',   // White icon
-          secondary: '#28a745', // Green icon background
+          primary: "#ffffff", // White icon
+          secondary: "#28a745", // Green icon background
         },
       });
     }
@@ -110,23 +136,23 @@ function PropertyHeader({ property }: { property: Property }) {
             priority
           />
           <div className="absolute top-4 right-4 flex space-x-2">
-            <button className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white transition">
+            <button onClick={handleShare} className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white transition">
               <Share2 size={20} />
             </button>
             {/* <button className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-pink-500 hover:bg-white transition">
               <Heart size={20} />
             </button> */}
-             <motion.button
-                          onClick={handleFavoriteToggle}
-                          whileHover={{ scale: 1.1 }}
-                          className="bg-white/90 backdrop-blur-md p-2.5 rounded-full shadow-sm"
-                        >
-                          <Heart 
-                            size={20} 
-                            className={isFav ? 'text-red-500' : 'text-gray-700'}
-                            fill={isFav ? 'currentColor' : 'none'}
-                          />
-                        </motion.button>
+            <motion.button
+              onClick={handleFavoriteToggle}
+              whileHover={{ scale: 1.1 }}
+              className="bg-white/90 backdrop-blur-md p-2.5 rounded-full shadow-sm"
+            >
+              <Heart
+                size={20}
+                className={isFav ? "text-red-500" : "text-gray-700"}
+                fill={isFav ? "currentColor" : "none"}
+              />
+            </motion.button>
             <button className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white transition">
               <Printer size={20} />
             </button>
@@ -422,70 +448,6 @@ function FloorplansTabContent({
     </div>
   );
 }
-
-// function FloorplanCard({ plan, developerName, location }: {
-//     plan: Property['floorplans'][0],
-//     developerName: string,
-//     location: string
-// }) {
-//     return (
-//         // ✅ Add w-full and max-w-md here to control the width
-//         <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden transition-shadow hover:shadow-2xl w-full max-w-md  ">
-
-//             {/* Image Section */}
-//             <div className="relative w-full h-60">
-//                 <Image src={plan.image} alt={plan.name} fill className="object-cover" />
-//                 <div className="absolute top-4 left-4 bg-white text-gray-800 text-sm font-bold px-4 py-2 rounded-full shadow-lg">
-//                     {plan.priceRange}
-//                 </div>
-//                 <div className="absolute top-4 right-4 flex gap-2">
-//                     <button className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg text-purple-600 hover:bg-white transition">
-//                         <Car size={20} />
-//                     </button>
-//                     <button className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg text-pink-500 hover:bg-white transition">
-//                         <Heart size={20} />
-//                     </button>
-//                 </div>
-//             </div>
-
-//             {/* Content Section */}
-//             <div className="p-6">
-//                 <h3 className="text-2xl font-extrabold text-gray-900">{plan.name}</h3>
-//                 <p className="text-sm text-gray-500 mt-1">
-//                     by <a href="#" className="text-yellow-600 font-semibold underline">{developerName}</a>
-//                 </p>
-//                 <div className="flex items-center text-gray-500 text-sm mt-3">
-//                     <MapPin size={16} className="mr-2 text-blue-500 flex-shrink-0" />
-//                     <span>{location}</span>
-//                 </div>
-
-//                 <hr className="border-dashed my-4" />
-
-//                 {/* Specs Section */}
-//                 <div className="flex items-center gap-4">
-//                     {plan.specs.map((spec, i) => (
-//                         <div key={i} className="bg-green-50 text-green-800 text-sm font-medium px-3 py-1.5 rounded-full flex items-center gap-2 border border-green-200">
-//                             <spec.icon size={16} />
-//                             <span>{spec.text}</span>
-//                         </div>
-//                     ))}
-//                 </div>
-
-//                 {/* Contact Buttons */}
-//                 <div className="flex items-center gap-3 mt-6">
-//                     <button className="w-14 h-14 flex-shrink-0 rounded-full bg-green-500 text-white flex items-center justify-center shadow-lg hover:bg-green-600 transition">
-//                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654z"/></svg>
-//                     </button>
-//                     <button className="w-full bg-green-500 text-white py-4 px-6 rounded-full font-bold text-lg hover:bg-green-600 transition">
-//                         Contact Us
-//                     </button>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// }
-
-// This is the updated component for your app/properties/[id]/page.tsx file
 
 function FloorplanCard({
   plan,
@@ -916,43 +878,6 @@ function EMICalculatorTabContent({ property }: { property: Property }) {
     </div>
   );
 }
-
-// This is the updated component for your app/properties/[id]/page.tsx file
-
-// function AboutUsTabContent({ developer }: { developer: Developer }) {
-//     return (
-//         // ✅ Removed text-center from the main container
-//         <div className=''>
-//             {/* Stats Section - centered individually */}
-//             <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto mb-12 ">
-//                 <div className="text-center">
-//                     <p className="text-5xl font-bold text-gray-800">{developer.totalProjects}</p>
-//                     <p className="text-gray-500 mt-2">Total Projects</p>
-//                 </div>
-//                 <div className="text-center">
-//                     <p className="text-5xl font-bold text-gray-800">{developer.ongoingProjects}</p>
-//                     <p className="text-gray-500 mt-2">Ongoing Projects</p>
-//                 </div>
-//                 <div className="text-center">
-//                     <p className="text-5xl font-bold text-gray-800">{developer.yearsOfExperience}</p>
-//                     <p className="text-gray-500 mt-2">Years of Experience</p>
-//                 </div>
-//             </div>
-
-//             {/* Description and Link Section - left-aligned text */}
-//             <div className="max-w-3xl mx-auto">
-//                 <p className="text-gray-600 leading-relaxed text-left">
-//                     {developer.description}
-//                 </p>
-//                 <div className="mt-6 text-left">
-//                     <a href="#" className="text-green-600 font-semibold hover:underline">
-//                         View more by builder
-//                     </a>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// }
 
 function AboutUsTabContent({ developer }: { developer: Developer }) {
   return (
