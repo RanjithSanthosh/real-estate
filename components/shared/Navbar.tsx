@@ -37,7 +37,9 @@ export default function Navbar() {
             </button>
             <div className="hidden md:flex items-center gap-4 ">
                 <Search size={22} className="cursor-pointer hover:text-shadow-white" />
-                <Heart size={22} className="cursor-pointer " />
+<Link href="/favorites" className="hover:text-green-300">
+                          <Heart size={20} />
+                        </Link>
                 {/* <User size={22} className="cursor-pointer " /> */}
 
                 <button onClick={openLoginModal}>
