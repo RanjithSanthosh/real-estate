@@ -41,6 +41,8 @@ import { Metadata } from 'next';
 
 
 
+// --- MAIN PAGE COMPONENT ---
+
 export default function PropertyDetailPage({
   params,
 }: {
@@ -62,7 +64,7 @@ export default function PropertyDetailPage({
     <div className="bg-white font-sans">
       <Navbar />
       <main className="container mx-auto max-w-7xl px-4 py-12">
-        <PropertyHeader property={property} developer={developer} />
+        <PropertyHeader property={property} />
         <PropertyTabs property={property} developer={developer} />
         <LocationMap property={property} />
         <RelatedProperties currentProperty={property} />
@@ -72,123 +74,93 @@ export default function PropertyDetailPage({
 }
 
 // --- SUB-COMPONENT: PROPERTY HEADER ---
-function PropertyHeader({ 
-  property, 
-  developer 
-}: { 
-  property: Property; 
-  developer?: Developer;
-}) {
+function PropertyHeader({ property }: { property: Property }) {
   const [activeImage, setActiveImage] = useState(property.images[0]);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const isFav = isFavorite(property.id);
 
-  // Enhanced share function in Meesho-like format
-  const handleShare = async () => {
-    try {
-      // Create share data in the structured format like the image
-      const shareData = {
-        title: `Property Alert: ${property.name}`,
-        text: generateMeeshoStyleShareText(property, developer),
-        url: window.location.href,
-      };
+// --- 1. UPDATE: Enhance the handleShare function ---
+  // const handleShare = async () => {
+  //   // --- 2. Create a detailed description string ---
+  //   const description = `Check out this amazing property: ${
+  //     property.name
+  //   } in ${property.location} by ${property.developer}. It offers ${property.specs
+  //     .map((s) => s.text)
+  //     .join(", ")} with prices starting from ${property.priceRange}.`;
 
-      // Check if Web Share API is available
-      if (navigator.share) {
+  //   const shareData = {
+  //     title: property.name,
+  //     text: description, // Use the new detailed description here
+  //     url: window.location.href,
+  //   };
+
+  //   // Check if the Web Share API is available
+  //   if (navigator.share) {
+  //     try {
+  //       await navigator.share(shareData);
+  //       console.log("Property shared successfully!");
+  //     } catch (err) {
+  //       console.log("Share action was cancelled or failed", err);
+  //     }
+  //   } else {
+  //     // --- FALLBACK ---
+  //     // --- 3. Update the fallback to copy the description AND the link ---
+  //     try {
+  //       // Combine the description and the URL for the clipboard
+  //       const clipboardText = `${description}\n\nFind out more here: ${shareData.url}`;
+  //       await navigator.clipboard.writeText(clipboardText);
+  //       // Update the toast message for better feedback
+  //       toast.success("Property details copied to clipboard!");
+  //     } catch (err) {
+  //       console.error("Failed to copy details: ", err);
+  //       toast.error("Could not copy the details.");
+  //     }
+  //   }
+  // };
+
+const handleShare = async () => {
+    const description = `Check out this amazing property: ${
+      property.name
+    } in ${property.location} by ${property.developer}.`;
+    
+    const url = window.location.href;
+
+    // The data to share: title, text, and URL. NO file.
+    const shareData = {
+      title: property.name,
+      text: description,
+      url: url,
+    };
+
+    // Check if the Web Share API is available
+    if (navigator.share) {
+      try {
         await navigator.share(shareData);
-        console.log("Property shared successfully in Meesho format!");
-      } else {
-        // Fallback to clipboard
-        await handleClipboardFallback(shareData);
+        console.log("Property link shared successfully!");
+      } catch (err) {
+        console.log("Share action was cancelled or failed", err);
       }
-    } catch (err) {
-      // User cancelled the share or share failed
-      if (err instanceof Error && err.name !== 'AbortError') {
-        console.error('Share failed:', err);
-        // Fallback to clipboard
-        await handleClipboardFallback({
-          title: `Property Alert: ${property.name}`,
-          text: generateMeeshoStyleShareText(property, developer),
-          url: window.location.href,
-        });
+    } else {
+      // --- FALLBACK ---
+      // If the API is not available, copy the details to the clipboard
+      try {
+        const clipboardText = `${description}\n\nSee more here: ${url}`;
+        await navigator.clipboard.writeText(clipboardText);
+        toast.success("Property details copied to clipboard!");
+      } catch (err) {
+        console.error("Failed to copy details: ", err);
+        toast.error("Could not copy the details.");
       }
     }
   };
 
-  // Generate share text in Meesho-style format
-  const generateMeeshoStyleShareText = (property: Property, developer?: Developer) => {
-    const specs = property.specs.map(spec => spec.text).join(' • ');
-    const keyFeatures = property.salientFeatures?.slice(0, 2).join(' • ') || '';
-    
-    let shareText = `🏘️ Property Update: ${property.name} is available for booking.\n\n`;
-    shareText += `📍 Location: ${property.location}\n`;
-    shareText += `💰 Price: ${property.priceRange}\n`;
-    shareText += `📊 Specifications: ${specs}\n`;
-    
-    if (keyFeatures) {
-      shareText += `⭐ Features: ${keyFeatures}\n`;
-    }
-    
-    if (developer) {
-      shareText += `🏢 Developer: ${developer.name} (${developer.yearsOfExperience}+ years experience)\n`;
-    }
-    
-    shareText += `\nCheck this property now!\n`;
-    shareText += `Reply "STOP" to unsubscribe\n\n`;
-    shareText += `---\n`;
-    shareText += `View Property Details`;
 
-    return shareText;
-  };
-
-  // Alternative concise version (like the exact Meesho format)
-  const generateConciseShareText = (property: Property) => {
-    return `Property Alert: ${property.name} at ${property.location} is available for ${property.priceRange}. \n\nCheck this amazing opportunity!\n\nView Details: ${window.location.href}\n\nReply "STOP" to unsubscribe`;
-  };
-
-  // Clipboard fallback function
-  const handleClipboardFallback = async (shareData: { title: string; text: string; url: string }) => {
-    try {
-      // Combine all data for clipboard
-      const clipboardText = `${shareData.title}\n\n${shareData.text}\n\n${shareData.url}`;
-      
-      await navigator.clipboard.writeText(clipboardText);
-      toast.success("📋 Property details copied to clipboard!", {
-        duration: 3000,
-        style: {
-          background: '#10B981',
-          color: 'white',
-          fontSize: '14px',
-          fontWeight: '500',
-        },
-      });
-    } catch (err) {
-      console.error('Clipboard fallback failed:', err);
-      
-      // Ultimate fallback - show share data in alert
-      const shareContent = `${shareData.title}\n\n${shareData.text}\n\n${shareData.url}`;
-      alert(`Share this property:\n\n${shareContent}`);
-    }
-  };
-
-  // Enhanced share with loading state
-  const handleShareWithFallbacks = async () => {
-    // Show loading state
-    toast.loading("Preparing property details...", { id: "share" });
-
-    try {
-      await handleShare();
-      toast.dismiss("share");
-    } catch (error) {
-      toast.dismiss("share");
-      console.error("Sharing failed:", error);
-    }
-  };
 
   const handleFavoriteToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
+    // Step 2: Use the toast function
     if (isFav) {
       removeFavorite(property.id);
       toast("Property removed from favorites", {
@@ -196,19 +168,19 @@ function PropertyHeader({
       });
     } else {
       addFavorite(property.id);
+      // This creates a success toast that looks similar to your image
       toast.success("Property added to favorites", {
         style: {
-          background: "#28a745",
-          color: "#ffffff",
+          background: "#28a745", // Green background
+          color: "#ffffff", // White text
         },
         iconTheme: {
-          primary: "#ffffff",
-          secondary: "#28a745",
+          primary: "#ffffff", // White icon
+          secondary: "#28a745", // Green icon background
         },
       });
     }
   };
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
       {/* Left Column: Image Gallery */}
@@ -222,20 +194,16 @@ function PropertyHeader({
             priority
           />
           <div className="absolute top-4 right-4 flex space-x-2">
-            <motion.button
-              onClick={handleShareWithFallbacks}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white transition shadow-md"
-              title="Share property details"
-            >
+            <button onClick={handleShare} className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white transition">
               <Share2 size={20} />
-            </motion.button>
+            </button>
+            {/* <button className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-pink-500 hover:bg-white transition">
+              <Heart size={20} />
+            </button> */}
             <motion.button
               onClick={handleFavoriteToggle}
               whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white transition shadow-md"
+              className="bg-white/90 backdrop-blur-md p-2.5 rounded-full shadow-sm"
             >
               <Heart
                 size={20}
@@ -243,15 +211,9 @@ function PropertyHeader({
                 fill={isFav ? "currentColor" : "none"}
               />
             </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white transition shadow-md"
-              onClick={() => window.print()}
-              title="Print property details"
-            >
+            <button className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white transition">
               <Printer size={20} />
-            </motion.button>
+            </button>
           </div>
         </div>
         <div className="grid grid-cols-4 gap-4">
@@ -273,7 +235,6 @@ function PropertyHeader({
           ))}
         </div>
       </div>
-      
       {/* Right Column: Property Details */}
       <div className="lg:col-span-2">
         <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-1">
@@ -305,11 +266,11 @@ function PropertyHeader({
             {property.priceRange}
           </p>
         </div>
-        <div className="sm:flex-row gap-4 mt-6">
+        <div className=" sm:flex-row gap-4 mt-6">
           <button className="flex-1 bg-white text-green-600 border-2 border-green-500 font-bold py-3 px-6 rounded-3xl hover:bg-green-50 transition w-lg">
             Download Brochure
           </button>
-          <button className="flex-1 bg-green-500 text-white font-bold py-3 px-6 rounded-3xl hover:bg-green-600 transition flex items-center justify-center gap-2 w-lg mt-5">
+          <button className="flex-1 bg-green-500 text-white font-bold py-3 px-6 rounded-3xl hover:bg-green-600 transition flex items-center justify-center gap-2 w-lg mt-5  ">
             <Phone size={18} /> Call Us
           </button>
         </div>
@@ -317,7 +278,6 @@ function PropertyHeader({
     </div>
   );
 }
-
 
 // --- SUB-COMPONENT: PROPERTY TABS ---
 function PropertyTabs({
