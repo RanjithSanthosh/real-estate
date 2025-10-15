@@ -1290,45 +1290,48 @@ function PropertyHeader({
 const handleShare = async () => {
   try {
     const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
+    const shareUrl = window.location.href;
     
-    const shareData = {
-      title: `${property.name} - ${property.developer}`,
-      text: shareDescription,
-      url: window.location.href,
-    };
+    // Detect platform
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isWhatsApp = /WhatsApp/i.test(navigator.userAgent);
 
-    // Prepare image file for sharing
-    const imageFile = await prepareImageForSharing(activeImage, property.name);
-
-    // Strategy 1: Try sharing with both image and text
-    if (navigator.share && navigator.canShare && imageFile && navigator.canShare({ files: [imageFile], text: shareDescription })) {
-      try {
+    if (isMobile && !isWhatsApp) {
+      // For mobile (except WhatsApp), try with image
+      const imageFile = await prepareImageForSharing(activeImage, property.name);
+      
+      if (navigator.share && navigator.canShare && imageFile && navigator.canShare({ files: [imageFile] })) {
         await navigator.share({
-          ...shareData,
+          title: `${property.name} - ${property.developer}`,
+          text: shareDescription,
+          url: shareUrl,
           files: [imageFile],
         });
-        console.log("Property shared successfully with image and text!");
         return;
-      } catch (imageShareError) {
-        console.log("Image sharing failed, falling back to text-only");
       }
     }
 
-    // Strategy 2: Try text-only sharing (more reliable)
+    // For WhatsApp and other platforms, use text-only for better compatibility
     if (navigator.share) {
-      await navigator.share(shareData);
-      console.log("Property metadata shared successfully!");
+      await navigator.share({
+        title: `${property.name} - ${property.developer}`,
+        text: `${shareDescription}\n\n${shareUrl}`,
+        url: shareUrl,
+      });
     } else {
-      // Strategy 3: Fallback to clipboard
-      await handleClipboardFallback(shareData);
+      // Fallback to clipboard
+      await handleClipboardFallback({
+        title: `${property.name} - ${property.developer}`,
+        text: shareDescription,
+        url: shareUrl,
+      });
     }
   } catch (err) {
     if (err instanceof Error && err.name !== "AbortError") {
       console.error('Share failed:', err);
-      const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
       await handleClipboardFallback({
         title: `${property.name} - ${property.developer}`,
-        text: shareDescription,
+        text: `🏠 ${property.name} in ${property.location} | ${property.priceRange}`,
         url: window.location.href,
       });
     }
@@ -1377,29 +1380,52 @@ const handleShareWithFallbacks = async () => {
   }
 };
 
-  const handleClipboardFallback = async (shareData: {
-    title: string;
-    text: string;
-    url: string;
-  }) => {
-    try {
-      const clipboardText = `${shareData.title}\n${shareData.text}\n${shareData.url}`;
-      await navigator.clipboard.writeText(clipboardText);
-      toast.success("📋 Property details copied to clipboard!", {
-        duration: 3000,
-        style: {
-          background: "#10B981",
-          color: "white",
-          fontSize: "14px",
-          fontWeight: "500",
-        },
-      });
-    } catch (err) {
-      console.error("Clipboard fallback failed:", err);
-      const shareContent = `${shareData.title}\n${shareData.text}\n${shareData.url}`;
-      alert(`Share this property:\n${shareContent}`);
-    }
-  };
+const handleClipboardFallback = async (shareData: {
+  title: string;
+  text: string;
+  url: string;
+}) => {
+  try {
+    // Create a more comprehensive clipboard content
+    const clipboardText = `
+${shareData.title}
+
+${shareData.text}
+
+🔗 ${shareData.url}
+
+🏠 View this amazing property with detailed images and specifications!
+    `.trim();
+
+    await navigator.clipboard.writeText(clipboardText);
+    
+    toast.success("📋 Property details copied to clipboard!", {
+      duration: 4000,
+      style: {
+        background: "#10B981",
+        color: "white",
+        fontSize: "14px",
+        fontWeight: "500",
+      },
+      icon: "✅",
+    });
+  } catch (err) {
+    console.error("Clipboard fallback failed:", err);
+    
+    // Ultimate fallback - show share data in a user-friendly way
+    const shareContent = `
+Share this property:
+
+${shareData.title}
+
+${shareData.text}
+
+${shareData.url}
+    `.trim();
+    
+    alert(shareContent);
+  }
+};
 
 
 
