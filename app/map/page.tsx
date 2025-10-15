@@ -2,7 +2,7 @@
 import React from 'react'
 import AboutHeroSection from '@/components/careers/careersHeroSection';
 import JobResults from '@/components/careers/JobResults';
-import SiteMapFooter from "@/components/homePage/SiteMapFooter";
+import SiteMapFooter from "./SiteMapFooter";
 import DetailedFooter from "@/components/aboutPage/DetailedFooter";
 
 import GenericHero from "@/components/shared/GenericHero";
@@ -28,14 +28,14 @@ const page = () => {
       /> */}
 
  <GenericHero 
-        title="Careers" 
+        title="Map" 
         subtitle="Come grow with us" 
         backgroundImage={AboutHERO}
-        activePage="Careers"
+        activePage=""
       />
 
 
-      <JobResults/>
+      {/* <JobResults/> */}
       <footer>
         <SiteMapFooter />
         <DetailedFooter />

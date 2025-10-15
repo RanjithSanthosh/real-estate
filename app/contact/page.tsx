@@ -144,7 +144,7 @@ import TeamQuoteSection from "@/components/aboutPage/TeamQuoteSection";
 import VisionMissionSection from "@/components/aboutPage/VisionMissionSection";
 import MessageFromCEOSection from "@/components/aboutPage/MessageFromCEOSection";
 import TeamSection from "@/components/aboutPage/TeamSection";
-import SiteMapFooter from "@/components/aboutPage/SiteMapFooter";
+import SiteMapFooter from "@/components/homePage/SiteMapFooter";
 import DetailedFooter from "@/components/aboutPage/DetailedFooter";
 import React from "react";
 

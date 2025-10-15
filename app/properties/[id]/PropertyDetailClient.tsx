@@ -25,7 +25,10 @@ import { toast } from "react-hot-toast";
 import { Icon, IconName } from "@/components/shared/IconMapper";
 
 // ✅ DEFINE THE NEW SERIALIZABLE TYPE
-type SerializableProperty = Omit<OriginalProperty, 'specs' | 'floorplans' | 'amenities'> & {
+type SerializableProperty = Omit<
+  OriginalProperty,
+  "specs" | "floorplans" | "amenities"
+> & {
   specs: { icon: string; text: string }[];
   floorplans: {
     name: string;
@@ -73,155 +76,170 @@ function PropertyHeader({
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const isFav = isFavorite(property.id);
 
+  const handleShare = async () => {
+    const { name, developer, location, priceRange, specs } = property;
+    const shareDescription = `🏠 ${name} in ${location} | ${priceRange} | ${specs
+      .map((s) => s.text)
+      .join(" • ")}`;
+    const shareUrl = window.location.href;
+    const fullText = `${shareDescription}\n\n${shareUrl}`;
 
-const handleShare = async () => {
-  const { name, developer, location, priceRange, specs } = property;
-  const shareDescription = `🏠 ${name} in ${location} | ${priceRange} | ${specs.map(s => s.text).join(" • ")}`;
-  const shareUrl = window.location.href;
-  const fullText = `${shareDescription}\n\n${shareUrl}`;
-
-  // Try to prepare the active image
-  let imageFile: File | null = null;
-  try {
-    imageFile = await prepareImageForSharing(activeImage, name);
-  } catch (err) {
-    console.warn("Image preparation failed, proceeding without image.");
-  }
-
-  // Check if Web Share API supports files
-  const canShareFiles = imageFile && navigator.canShare?.({ files: [imageFile] });
-
-  if (navigator.share) {
+    // Try to prepare the active image
+    let imageFile: File | null = null;
     try {
-      if (canShareFiles) {
-        // Share with image (Android Chrome)
-        await navigator.share({
-          title: `${name} - ${developer}`,
-          text: shareDescription,
-          url: shareUrl,
-          files: [imageFile],
-        });
-        return;
-      } else {
-        // Share without image (iOS, desktop, etc.)
-        await navigator.share({
-          title: `${name} - ${developer}`,
-          text: fullText,
-        });
-        return;
-      }
+      imageFile = await prepareImageForSharing(activeImage, name);
     } catch (err) {
-      if ((err as Error).name === "AbortError") return;
-      console.warn("Web Share API failed:", err);
+      console.warn("Image preparation failed, proceeding without image.");
     }
-  }
 
-  // Final fallback: clipboard
-  await handleClipboardFallback({
-    title: `${name} - ${developer}`,
-    text: shareDescription,
-    url: shareUrl,
-  });
-};
+    // Check if Web Share API supports files
+    const canShareFiles =
+      imageFile && navigator.canShare?.({ files: [imageFile] });
 
-const prepareImageForSharing = async (imageUrl: string, propertyName: string): Promise<File | null> => {
-  try {
-    // Ensure we're not trying to share a relative path
-    const absoluteUrl = new URL(imageUrl, window.location.origin).href;
+    if (navigator.share) {
+      try {
+        if (canShareFiles) {
+          // Share with image (Android Chrome)
+          await navigator.share({
+            title: `${name} - ${developer}`,
+            text: shareDescription,
+            url: shareUrl,
+            files: [imageFile],
+          });
+          return;
+        } else {
+          // Share without image (iOS, desktop, etc.)
+          await navigator.share({
+            title: `${name} - ${developer}`,
+            text: fullText,
+          });
+          return;
+        }
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return;
+        console.warn("Web Share API failed:", err);
+      }
+    }
 
-    const response = await fetch(absoluteUrl);
-    if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch image`);
-
-    const blob = await response.blob();
-    const fileName = `${propertyName.replace(/\s+/g, '_')}_property.jpg`;
-    const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
-
-    return file;
-  } catch (error) {
-    console.warn('Could not prepare image for sharing:', error);
-    return null;
-  }
-};
-
-const handleClipboardFallback = async (shareData: { title: string; text: string; url: string }) => {
-  const clipboardText = `${shareData.title}\n${shareData.text}\n\n🔗 ${shareData.url}`;
-  try {
-    await navigator.clipboard.writeText(clipboardText);
-    toast.success("📋 Link copied! Paste to share with preview.", {
-      duration: 4000,
-      icon: "✅",
-      style: { background: "#10B981", color: "white", fontSize: "14px", fontWeight: "500" },
-    });
-  } catch (err) {
-    console.error("Clipboard failed:", err);
-    alert(`Copy this link:\n${shareData.url}`);
-  }
-};
-
-const handleShareWithFallbacks = async () => {
-  toast.loading("Preparing to share...", { id: "share" });
-  try {
-    await handleShare();
-  } catch (error) {
-    console.error("Unexpected share error:", error);
+    // Final fallback: clipboard
     await handleClipboardFallback({
-      title: `${property.name} - ${property.developer}`,
-      text: `Check out ${property.name} in ${property.location}`,
-      url: window.location.href,
+      title: `${name} - ${developer}`,
+      text: shareDescription,
+      url: shareUrl,
     });
-  } finally {
-    toast.dismiss("share");
-  }
-};
+  };
 
-// const handleClipboardFallback = async (shareData: {
-//   title: string;
-//   text: string;
-//   url: string;
-// }) => {
-//   try {
-//     // Create a more comprehensive clipboard content
-//     const clipboardText = `
-// ${shareData.title}
+  const prepareImageForSharing = async (
+    imageUrl: string,
+    propertyName: string
+  ): Promise<File | null> => {
+    try {
+      // Ensure we're not trying to share a relative path
+      const absoluteUrl = new URL(imageUrl, window.location.origin).href;
 
-// ${shareData.text}
+      const response = await fetch(absoluteUrl);
+      if (!response.ok)
+        throw new Error(`HTTP ${response.status}: Failed to fetch image`);
 
-// 🔗 ${shareData.url}
+      const blob = await response.blob();
+      const fileName = `${propertyName.replace(/\s+/g, "_")}_property.jpg`;
+      const file = new File([blob], fileName, {
+        type: blob.type || "image/jpeg",
+      });
 
-// 🏠 View this amazing property with detailed images and specifications!
-//     `.trim();
+      return file;
+    } catch (error) {
+      console.warn("Could not prepare image for sharing:", error);
+      return null;
+    }
+  };
 
-//     await navigator.clipboard.writeText(clipboardText);
-    
-//     toast.success("📋 Property details copied to clipboard!", {
-//       duration: 4000,
-//       style: {
-//         background: "#10B981",
-//         color: "white",
-//         fontSize: "14px",
-//         fontWeight: "500",
-//       },
-//       icon: "✅",
-//     });
-//   } catch (err) {
-//     console.error("Clipboard fallback failed:", err);
-    
-//     // Ultimate fallback - show share data in a user-friendly way
-//     const shareContent = `
-// Share this property:
+  const handleClipboardFallback = async (shareData: {
+    title: string;
+    text: string;
+    url: string;
+  }) => {
+    const clipboardText = `${shareData.title}\n${shareData.text}\n\n🔗 ${shareData.url}`;
+    try {
+      await navigator.clipboard.writeText(clipboardText);
+      toast.success("📋 Link copied! Paste to share with preview.", {
+        duration: 4000,
+        icon: "✅",
+        style: {
+          background: "#10B981",
+          color: "white",
+          fontSize: "14px",
+          fontWeight: "500",
+        },
+      });
+    } catch (err) {
+      console.error("Clipboard failed:", err);
+      alert(`Copy this link:\n${shareData.url}`);
+    }
+  };
 
-// ${shareData.title}
+  const handleShareWithFallbacks = async () => {
+    toast.loading("Preparing to share...", { id: "share" });
+    try {
+      await handleShare();
+    } catch (error) {
+      console.error("Unexpected share error:", error);
+      await handleClipboardFallback({
+        title: `${property.name} - ${property.developer}`,
+        text: `Check out ${property.name} in ${property.location}`,
+        url: window.location.href,
+      });
+    } finally {
+      toast.dismiss("share");
+    }
+  };
 
-// ${shareData.text}
+  // const handleClipboardFallback = async (shareData: {
+  //   title: string;
+  //   text: string;
+  //   url: string;
+  // }) => {
+  //   try {
+  //     // Create a more comprehensive clipboard content
+  //     const clipboardText = `
+  // ${shareData.title}
 
-// ${shareData.url}
-//     `.trim();
-    
-//     alert(shareContent);
-//   }
-// };
+  // ${shareData.text}
 
+  // 🔗 ${shareData.url}
 
+  // 🏠 View this amazing property with detailed images and specifications!
+  //     `.trim();
+
+  //     await navigator.clipboard.writeText(clipboardText);
+
+  //     toast.success("📋 Property details copied to clipboard!", {
+  //       duration: 4000,
+  //       style: {
+  //         background: "#10B981",
+  //         color: "white",
+  //         fontSize: "14px",
+  //         fontWeight: "500",
+  //       },
+  //       icon: "✅",
+  //     });
+  //   } catch (err) {
+  //     console.error("Clipboard fallback failed:", err);
+
+  //     // Ultimate fallback - show share data in a user-friendly way
+  //     const shareContent = `
+  // Share this property:
+
+  // ${shareData.title}
+
+  // ${shareData.text}
+
+  // ${shareData.url}
+  //     `.trim();
+
+  //     alert(shareContent);
+  //   }
+  // };
 
   const handleFavoriteToggle = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -462,31 +480,45 @@ function OverviewTabContent({ property }: { property: SerializableProperty }) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
         <div>
           <p className="text-gray-500 mb-1">Zoning</p>
-          <p className="font-semibold text-gray-800">{property.overview.zoning}</p>
+          <p className="font-semibold text-gray-800">
+            {property.overview.zoning}
+          </p>
         </div>
         <div>
           <p className="text-gray-500 mb-1">Property Type</p>
-          <p className="font-semibold text-gray-800">{property.overview.propertyType}</p>
+          <p className="font-semibold text-gray-800">
+            {property.overview.propertyType}
+          </p>
         </div>
         <div>
           <p className="text-gray-500 mb-1">Status</p>
-          <p className="font-semibold text-gray-800">{property.overview.status}</p>
+          <p className="font-semibold text-gray-800">
+            {property.overview.status}
+          </p>
         </div>
         <div>
           <p className="text-gray-500 mb-1">Land Extent</p>
-          <p className="font-semibold text-gray-800">{property.overview.landExtent}</p>
+          <p className="font-semibold text-gray-800">
+            {property.overview.landExtent}
+          </p>
         </div>
         <div>
           <p className="text-gray-500 mb-1">Price per Sq ft</p>
-          <p className="font-semibold text-gray-800">{property.overview.pricePerSqFt}</p>
+          <p className="font-semibold text-gray-800">
+            {property.overview.pricePerSqFt}
+          </p>
         </div>
         <div>
           <p className="text-gray-500 mb-1">Total Units</p>
-          <p className="font-semibold text-gray-800">{property.overview.totalUnits}</p>
+          <p className="font-semibold text-gray-800">
+            {property.overview.totalUnits}
+          </p>
         </div>
         <div className="col-span-2">
           <p className="text-gray-500 mb-1">Project RERA number</p>
-          <p className="font-semibold text-gray-800">{property.overview.projectRera}</p>
+          <p className="font-semibold text-gray-800">
+            {property.overview.projectRera}
+          </p>
         </div>
       </div>
       <p className="text-gray-600 leading-relaxed mt-8">
@@ -534,9 +566,11 @@ function SpecificationsTabContent({
         ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-        {(specs[activeSpecTab as keyof typeof specs] || []).map((spec, index) => (
-          <FeatureListItem key={index} text={spec} />
-        ))}
+        {(specs[activeSpecTab as keyof typeof specs] || []).map(
+          (spec, index) => (
+            <FeatureListItem key={index} text={spec} />
+          )
+        )}
       </div>
     </div>
   );
@@ -686,7 +720,11 @@ function GalleryTabContent({
 }
 
 // --- EMI Calculator Tab ---
-function EMICalculatorTabContent({ property }: { property: SerializableProperty }) {
+function EMICalculatorTabContent({
+  property,
+}: {
+  property: SerializableProperty;
+}) {
   const [selectedUnitIndex, setSelectedUnitIndex] = useState(0);
   const [loanAmount, setLoanAmount] = useState(59000000);
   const [loanTenure, setLoanTenure] = useState(20);
@@ -704,7 +742,9 @@ function EMICalculatorTabContent({ property }: { property: SerializableProperty 
 
   useEffect(() => {
     if (property.floorplans && property.floorplans[selectedUnitIndex]) {
-      const newLoanAmount = parsePrice(property.floorplans[selectedUnitIndex].priceRange);
+      const newLoanAmount = parsePrice(
+        property.floorplans[selectedUnitIndex].priceRange
+      );
       setLoanAmount(newLoanAmount);
     }
   }, [selectedUnitIndex, property.floorplans]);
@@ -768,7 +808,9 @@ function EMICalculatorTabContent({ property }: { property: SerializableProperty 
         <div className="space-y-8 pt-4">
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="text-sm font-medium text-gray-700">Loan Amount</label>
+              <label className="text-sm font-medium text-gray-700">
+                Loan Amount
+              </label>
               <span className="font-bold text-green-600 text-sm">
                 {formatCrores(loanAmount)}
               </span>
@@ -792,7 +834,9 @@ function EMICalculatorTabContent({ property }: { property: SerializableProperty 
           </div>
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="text-sm font-medium text-gray-700">Loan Tenure</label>
+              <label className="text-sm font-medium text-gray-700">
+                Loan Tenure
+              </label>
               <span className="font-bold text-green-600 text-sm">
                 {loanTenure} yrs
               </span>
@@ -816,7 +860,9 @@ function EMICalculatorTabContent({ property }: { property: SerializableProperty 
           </div>
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="text-sm font-medium text-gray-700">Interest Rate</label>
+              <label className="text-sm font-medium text-gray-700">
+                Interest Rate
+              </label>
               <span className="font-bold text-green-600 text-sm">
                 {interestRate.toFixed(1)}% p.a
               </span>
@@ -871,18 +917,24 @@ function EMICalculatorTabContent({ property }: { property: SerializableProperty 
                   <span className="inline-block w-3 h-3 bg-green-500 rounded-full mr-2"></span>
                   Principal:
                 </span>
-                <span className="font-semibold">{formatCrores(loanAmount)}</span>
+                <span className="font-semibold">
+                  {formatCrores(loanAmount)}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span>
                   <span className="inline-block w-3 h-3 bg-gray-200 rounded-full mr-2"></span>
                   Interest:
                 </span>
-                <span className="font-semibold">{formatCrores(totalInterest)}</span>
+                <span className="font-semibold">
+                  {formatCrores(totalInterest)}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span>Total Payable:</span>
-                <span className="font-semibold">{formatCrores(totalPayable)}</span>
+                <span className="font-semibold">
+                  {formatCrores(totalPayable)}
+                </span>
               </div>
               <div className="flex justify-between items-center pt-3 mt-3 border-t border-dashed">
                 <span className="text-2xl font-bold">EMI :</span>
@@ -904,20 +956,28 @@ function AboutUsTabContent({ developer }: { developer: Developer }) {
     <div>
       <div className="grid grid-cols-3 gap-8 max-w-2xl mb-12">
         <div className="text-center">
-          <p className="text-5xl font-bold text-gray-800">{developer.totalProjects}</p>
+          <p className="text-5xl font-bold text-gray-800">
+            {developer.totalProjects}
+          </p>
           <p className="text-gray-500 mt-2">Total Projects</p>
         </div>
         <div className="text-center">
-          <p className="text-5xl font-bold text-gray-800">{developer.ongoingProjects}</p>
+          <p className="text-5xl font-bold text-gray-800">
+            {developer.ongoingProjects}
+          </p>
           <p className="text-gray-500 mt-2">Ongoing Projects</p>
         </div>
         <div className="text-center">
-          <p className="text-5xl font-bold text-gray-800">{developer.yearsOfExperience}</p>
+          <p className="text-5xl font-bold text-gray-800">
+            {developer.yearsOfExperience}
+          </p>
           <p className="text-gray-500 mt-2">Years of Experience</p>
         </div>
       </div>
       <div className="max-w-3xl">
-        <p className="text-gray-600 leading-relaxed text-left">{developer.description}</p>
+        <p className="text-gray-600 leading-relaxed text-left">
+          {developer.description}
+        </p>
         <div className="mt-6 text-left">
           <a href="#" className="text-green-600 font-semibold hover:underline">
             View more by builder
@@ -950,7 +1010,11 @@ function LocationMap({ property }: { property: SerializableProperty }) {
 }
 
 // --- Related Properties ---
-function RelatedProperties({ currentProperty }: { currentProperty: SerializableProperty }) {
+function RelatedProperties({
+  currentProperty,
+}: {
+  currentProperty: SerializableProperty;
+}) {
   const related = useMemo(
     () =>
       propertiesData
@@ -967,7 +1031,9 @@ function RelatedProperties({ currentProperty }: { currentProperty: SerializableP
 
   return (
     <div className="mt-8 py-8 border-t">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6">Related Properties</h2>
+      <h2 className="text-3xl font-bold text-gray-900 mb-6">
+        Related Properties
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {related.map((property) => (
           <RelatedPropertyCard key={property.id} property={property} />
@@ -1006,7 +1072,9 @@ function RelatedPropertyCard({ property }: { property: OriginalProperty }) {
           </div>
         </div>
         <div className="p-5">
-          <h3 className="text-lg font-bold text-gray-900 truncate">{property.name}</h3>
+          <h3 className="text-lg font-bold text-gray-900 truncate">
+            {property.name}
+          </h3>
           <p className="text-sm text-gray-500 mb-3">by {property.developer}</p>
           <div className="flex items-center text-gray-500 text-sm mb-4">
             <MapPin size={14} className="mr-1.5 flex-shrink-0" />
@@ -1043,7 +1111,10 @@ function AmenitiesTabContent({
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-8 gap-x-4">
       {amenities.map((amenity, index) => (
-        <div key={index} className="flex flex-col items-center gap-3 text-center">
+        <div
+          key={index}
+          className="flex flex-col items-center gap-3 text-center"
+        >
           <div className="flex items-center justify-center w-20 h-20 rounded-full bg-yellow-100/60 text-yellow-500">
             <Icon name={amenity.icon as IconName} size={36} strokeWidth={1.5} />
           </div>

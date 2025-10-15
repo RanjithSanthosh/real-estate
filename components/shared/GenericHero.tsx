@@ -1053,7 +1053,8 @@ export default function GenericHero({
             <motion.button
               onClick={openConsultationModal}
               whileHover={{ scale: 1.05 }}
-              className="hidden sm:flex items-center gap-2 border px-4 py-2 rounded-full font-medium"
+              whileTap={{ scale: 0.95 }}
+              className="hidden sm:flex items-center gap-2 border px-4 p-1 rounded-3xl font-medium"
             >
               <Phone size={16} /> Call Us
             </motion.button>
