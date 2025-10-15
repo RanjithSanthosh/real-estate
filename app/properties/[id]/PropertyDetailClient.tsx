@@ -1190,31 +1190,120 @@ function PropertyHeader({
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const isFav = isFavorite(property.id);
 
-  const handleShare = async () => {
-    try {
+//   const handleShare = async () => {
+//     try {
+//       const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
+//       const shareData = {
+//         title: `${property.name} - ${property.developer}`,
+//         text: shareDescription,
+//         url: window.location.href,
+//       };
+//       if (navigator.share) {
+//         await navigator.share(shareData);
+//         console.log("Property shared successfully with OG tags!");
+//       } else {
+//         await handleClipboardFallback(shareData);
+//       }
+//     } catch (err) {
+//       if (err instanceof Error && err.name !== "AbortError") {
+//         console.error("Share failed:", err);
+//         await handleClipboardFallback({
+//           title: `${property.name} - ${property.developer}`,
+//           text: shareDescription,
+//           url: window.location.href,
+//         });
+//       }
+//     }
+//   };
+
+
+const handleShare = async () => {
+  try {
+    const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
+    
+    const shareData = {
+      title: `${property.name} - ${property.developer}`,
+      text: shareDescription,
+      url: window.location.href,
+    };
+
+    // Prepare image file for sharing
+    const imageFile = await prepareImageForSharing(activeImage, property.name);
+
+    // Check if Web Share API supports files
+    if (navigator.share && navigator.canShare && imageFile && navigator.canShare({ files: [imageFile] })) {
+      // Share with image and text
+      await navigator.share({
+        ...shareData,
+        files: [imageFile],
+      });
+      console.log("Property shared successfully with image!");
+    } 
+    // Check if basic Web Share API is available (without files)
+    else if (navigator.share) {
+      // Share without image
+      await navigator.share(shareData);
+      console.log("Property metadata shared successfully (without image)!");
+    } else {
+      // Fallback to clipboard
+      await handleClipboardFallback(shareData);
+    }
+  } catch (err) {
+    if (err instanceof Error && err.name !== "AbortError") {
+      console.error("Share failed:", err);
       const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
-      const shareData = {
+      await handleClipboardFallback({
         title: `${property.name} - ${property.developer}`,
         text: shareDescription,
         url: window.location.href,
-      };
-      if (navigator.share) {
-        await navigator.share(shareData);
-        console.log("Property shared successfully with OG tags!");
-      } else {
-        await handleClipboardFallback(shareData);
-      }
-    } catch (err) {
-      if (err instanceof Error && err.name !== "AbortError") {
-        console.error("Share failed:", err);
-        await handleClipboardFallback({
-          title: `${property.name} - ${property.developer}`,
-          text: shareDescription,
-          url: window.location.href,
-        });
-      }
+      });
     }
-  };
+  }
+};
+
+// Add this function to prepare image for sharing
+const prepareImageForSharing = async (imageUrl: string, propertyName: string): Promise<File | null> => {
+  try {
+    // Fetch the image
+    const response = await fetch(imageUrl);
+    if (!response.ok) throw new Error('Failed to fetch image');
+    
+    const blob = await response.blob();
+    
+    // Create a File object from the blob
+    const file = new File([blob], 
+      `${propertyName.replace(/\s+/g, '_')}_property.jpg`, 
+      { type: blob.type || 'image/jpeg' }
+    );
+    
+    return file;
+  } catch (error) {
+    console.warn('Could not prepare image for sharing:', error);
+    return null;
+  }
+};
+
+const handleShareWithFallbacks = async () => {
+  toast.loading("Preparing property details with image...", { id: "share" });
+
+  try {
+    await handleShare();
+    toast.dismiss("share");
+  } catch (error) {
+    toast.dismiss("share");
+    
+    // If all sharing methods fail, show a message about the OG tags
+    toast.success("Link copied! When shared, it will show property preview with image.", {
+      duration: 4000,
+      icon: "🔗",
+    });
+    
+    // Still copy the link to clipboard as fallback
+    const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange}`;
+    const clipboardText = `${property.name}\n${shareDescription}\n${window.location.href}`;
+    await navigator.clipboard.writeText(clipboardText);
+  }
+};
 
   const handleClipboardFallback = async (shareData: {
     title: string;
@@ -1240,16 +1329,7 @@ function PropertyHeader({
     }
   };
 
-  const handleShareWithFallbacks = async () => {
-    toast.loading("Preparing property details...", { id: "share" });
-    try {
-      await handleShare();
-      toast.dismiss("share");
-    } catch (error) {
-      toast.dismiss("share");
-      console.error("Sharing failed:", error);
-    }
-  };
+
 
   const handleFavoriteToggle = (e: React.MouseEvent) => {
     e.preventDefault();
