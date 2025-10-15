@@ -156,6 +156,7 @@ const handleFavoriteToggle = (e: React.MouseEvent) => {
                 className="bg-green-50 border border-green-200 text-green-800 text-sm font-medium px-3 py-1.5 rounded-full flex items-center gap-2"
               >
                 <spec.icon size={16} />
+              
                 <span>{spec.text}</span>
               </div>
             ))}
