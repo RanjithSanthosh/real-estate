@@ -1285,75 +1285,166 @@ function PropertyHeader({
 
 
 
+// const handleShare = async () => {
+//   try {
+//     const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
+//     const shareUrl = window.location.href;
+//     const fullShareText = `${shareDescription}\n\n${shareUrl}`;
+
+//     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+//     // Try different strategies in order of reliability
+//     if (isMobile) {
+//       // Strategy 1: Direct WhatsApp URL (most reliable for WhatsApp)
+//       if (navigator.userAgent.includes('WhatsApp') || confirm('Open in WhatsApp?')) {
+//         const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(fullShareText)}`;
+//         window.location.href = whatsappUrl;
+//         return;
+//       }
+
+//       // Strategy 2: Web Share API with text-only for WhatsApp
+//       if (navigator.share) {
+//         try {
+//           await navigator.share({
+//             text: fullShareText,
+//           });
+//           return;
+//         } catch (shareError) {
+//           console.log('Web Share failed, trying alternative');
+//         }
+//       }
+//     }
+
+//     // Strategy 3: Standard Web Share for all platforms
+//     if (navigator.share) {
+//       await navigator.share({
+//         title: `${property.name} - ${property.developer}`,
+//         text: fullShareText,
+//         url: shareUrl,
+//       });
+//     } else {
+//       // Final fallback: clipboard
+//       await handleClipboardFallback({
+//         title: `${property.name} - ${property.developer}`,
+//         text: shareDescription,
+//         url: shareUrl,
+//       });
+//     }
+//   } catch (err) {
+//     if (err instanceof Error && err.name !== "AbortError") {
+//       console.error('All sharing methods failed:', err);
+//       await handleClipboardFallback({
+//         title: `${property.name} - ${property.developer}`,
+//         text: `🏠 ${property.name} in ${property.location} | ${property.priceRange}`,
+//         url: window.location.href,
+//       });
+//     }
+//   }
+// };
+// Keep your existing prepareImageForSharing function
+// const prepareImageForSharing = async (imageUrl: string, propertyName: string): Promise<File | null> => {
+//   try {
+//     const response = await fetch(imageUrl);
+//     if (!response.ok) throw new Error('Failed to fetch image');
+    
+//     const blob = await response.blob();
+    
+//     const file = new File([blob], 
+//       `${propertyName.replace(/\s+/g, '_')}_property.jpg`, 
+//       { type: blob.type || 'image/jpeg' }
+//     );
+    
+//     return file;
+//   } catch (error) {
+//     console.warn('Could not prepare image for sharing:', error);
+//     return null;
+//   }
+// };
+
+// const handleShareWithFallbacks = async () => {
+//   toast.loading("Preparing property details with image...", { id: "share" });
+
+//   try {
+//     await handleShare();
+//     toast.dismiss("share");
+//   } catch (error) {
+//     toast.dismiss("share");
+    
+//     // If all sharing methods fail, show a message about the OG tags
+//     toast.success("Link copied! When shared, it will show property preview with image.", {
+//       duration: 4000,
+//       icon: "🔗",
+//     });
+    
+//     // Still copy the link to clipboard as fallback
+//     const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange}`;
+//     const clipboardText = `${property.name}\n${shareDescription}\n${window.location.href}`;
+//     await navigator.clipboard.writeText(clipboardText);
+//   }
+// };
+
 const handleShare = async () => {
+  const { name, developer, location, priceRange, specs } = property;
+  const shareDescription = `🏠 ${name} in ${location} | ${priceRange} | ${specs.map(s => s.text).join(" • ")}`;
+  const shareUrl = window.location.href;
+  const fullText = `${shareDescription}\n\n${shareUrl}`;
+
+  // Try to prepare the active image
+  let imageFile: File | null = null;
   try {
-    const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
-    const shareUrl = window.location.href;
-    const fullShareText = `${shareDescription}\n\n${shareUrl}`;
+    imageFile = await prepareImageForSharing(activeImage, name);
+  } catch (err) {
+    console.warn("Image preparation failed, proceeding without image.");
+  }
 
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  // Check if Web Share API supports files
+  const canShareFiles = imageFile && navigator.canShare?.({ files: [imageFile] });
 
-    // Try different strategies in order of reliability
-    if (isMobile) {
-      // Strategy 1: Direct WhatsApp URL (most reliable for WhatsApp)
-      if (navigator.userAgent.includes('WhatsApp') || confirm('Open in WhatsApp?')) {
-        const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(fullShareText)}`;
-        window.location.href = whatsappUrl;
+  if (navigator.share) {
+    try {
+      if (canShareFiles) {
+        // Share with image (Android Chrome)
+        await navigator.share({
+          title: `${name} - ${developer}`,
+          text: shareDescription,
+          url: shareUrl,
+          files: [imageFile],
+        });
+        return;
+      } else {
+        // Share without image (iOS, desktop, etc.)
+        await navigator.share({
+          title: `${name} - ${developer}`,
+          text: fullText,
+        });
         return;
       }
-
-      // Strategy 2: Web Share API with text-only for WhatsApp
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            text: fullShareText,
-          });
-          return;
-        } catch (shareError) {
-          console.log('Web Share failed, trying alternative');
-        }
-      }
-    }
-
-    // Strategy 3: Standard Web Share for all platforms
-    if (navigator.share) {
-      await navigator.share({
-        title: `${property.name} - ${property.developer}`,
-        text: fullShareText,
-        url: shareUrl,
-      });
-    } else {
-      // Final fallback: clipboard
-      await handleClipboardFallback({
-        title: `${property.name} - ${property.developer}`,
-        text: shareDescription,
-        url: shareUrl,
-      });
-    }
-  } catch (err) {
-    if (err instanceof Error && err.name !== "AbortError") {
-      console.error('All sharing methods failed:', err);
-      await handleClipboardFallback({
-        title: `${property.name} - ${property.developer}`,
-        text: `🏠 ${property.name} in ${property.location} | ${property.priceRange}`,
-        url: window.location.href,
-      });
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return;
+      console.warn("Web Share API failed:", err);
     }
   }
+
+  // Final fallback: clipboard
+  await handleClipboardFallback({
+    title: `${name} - ${developer}`,
+    text: shareDescription,
+    url: shareUrl,
+  });
 };
-// Keep your existing prepareImageForSharing function
+
 const prepareImageForSharing = async (imageUrl: string, propertyName: string): Promise<File | null> => {
   try {
-    const response = await fetch(imageUrl);
-    if (!response.ok) throw new Error('Failed to fetch image');
-    
+    // Ensure we're not trying to share a relative path
+    const absoluteUrl = new URL(imageUrl, window.location.origin).href;
+
+    const response = await fetch(absoluteUrl);
+    if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch image`);
+
     const blob = await response.blob();
-    
-    const file = new File([blob], 
-      `${propertyName.replace(/\s+/g, '_')}_property.jpg`, 
-      { type: blob.type || 'image/jpeg' }
-    );
-    
+    const fileName = `${propertyName.replace(/\s+/g, '_')}_property.jpg`;
+    const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+
     return file;
   } catch (error) {
     console.warn('Could not prepare image for sharing:', error);
@@ -1361,74 +1452,83 @@ const prepareImageForSharing = async (imageUrl: string, propertyName: string): P
   }
 };
 
-const handleShareWithFallbacks = async () => {
-  toast.loading("Preparing property details with image...", { id: "share" });
-
+const handleClipboardFallback = async (shareData: { title: string; text: string; url: string }) => {
+  const clipboardText = `${shareData.title}\n${shareData.text}\n\n🔗 ${shareData.url}`;
   try {
-    await handleShare();
-    toast.dismiss("share");
-  } catch (error) {
-    toast.dismiss("share");
-    
-    // If all sharing methods fail, show a message about the OG tags
-    toast.success("Link copied! When shared, it will show property preview with image.", {
-      duration: 4000,
-      icon: "🔗",
-    });
-    
-    // Still copy the link to clipboard as fallback
-    const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange}`;
-    const clipboardText = `${property.name}\n${shareDescription}\n${window.location.href}`;
     await navigator.clipboard.writeText(clipboardText);
-  }
-};
-
-const handleClipboardFallback = async (shareData: {
-  title: string;
-  text: string;
-  url: string;
-}) => {
-  try {
-    // Create a more comprehensive clipboard content
-    const clipboardText = `
-${shareData.title}
-
-${shareData.text}
-
-🔗 ${shareData.url}
-
-🏠 View this amazing property with detailed images and specifications!
-    `.trim();
-
-    await navigator.clipboard.writeText(clipboardText);
-    
-    toast.success("📋 Property details copied to clipboard!", {
+    toast.success("📋 Link copied! Paste to share with preview.", {
       duration: 4000,
-      style: {
-        background: "#10B981",
-        color: "white",
-        fontSize: "14px",
-        fontWeight: "500",
-      },
       icon: "✅",
+      style: { background: "#10B981", color: "white", fontSize: "14px", fontWeight: "500" },
     });
   } catch (err) {
-    console.error("Clipboard fallback failed:", err);
-    
-    // Ultimate fallback - show share data in a user-friendly way
-    const shareContent = `
-Share this property:
-
-${shareData.title}
-
-${shareData.text}
-
-${shareData.url}
-    `.trim();
-    
-    alert(shareContent);
+    console.error("Clipboard failed:", err);
+    alert(`Copy this link:\n${shareData.url}`);
   }
 };
+
+const handleShareWithFallbacks = async () => {
+  toast.loading("Preparing to share...", { id: "share" });
+  try {
+    await handleShare();
+  } catch (error) {
+    console.error("Unexpected share error:", error);
+    await handleClipboardFallback({
+      title: `${property.name} - ${property.developer}`,
+      text: `Check out ${property.name} in ${property.location}`,
+      url: window.location.href,
+    });
+  } finally {
+    toast.dismiss("share");
+  }
+};
+
+// const handleClipboardFallback = async (shareData: {
+//   title: string;
+//   text: string;
+//   url: string;
+// }) => {
+//   try {
+//     // Create a more comprehensive clipboard content
+//     const clipboardText = `
+// ${shareData.title}
+
+// ${shareData.text}
+
+// 🔗 ${shareData.url}
+
+// 🏠 View this amazing property with detailed images and specifications!
+//     `.trim();
+
+//     await navigator.clipboard.writeText(clipboardText);
+    
+//     toast.success("📋 Property details copied to clipboard!", {
+//       duration: 4000,
+//       style: {
+//         background: "#10B981",
+//         color: "white",
+//         fontSize: "14px",
+//         fontWeight: "500",
+//       },
+//       icon: "✅",
+//     });
+//   } catch (err) {
+//     console.error("Clipboard fallback failed:", err);
+    
+//     // Ultimate fallback - show share data in a user-friendly way
+//     const shareContent = `
+// Share this property:
+
+// ${shareData.title}
+
+// ${shareData.text}
+
+// ${shareData.url}
+//     `.trim();
+    
+//     alert(shareContent);
+//   }
+// };
 
 
 
