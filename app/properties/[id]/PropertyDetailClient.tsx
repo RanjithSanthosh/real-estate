@@ -1291,58 +1291,27 @@ const handleShare = async () => {
     const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
     const shareUrl = window.location.href;
     
-    // More reliable WhatsApp detection
+    const fullShareText = `${shareDescription}\n\n${shareUrl}`;
+
+    // Detect if it's mobile
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const isWhatsApp = /WhatsApp/i.test(navigator.userAgent) || 
-                      navigator.userAgent.includes('WhatsApp') ||
-                      document.referrer.includes('whatsapp');
 
-    console.log('Platform detection:', { isMobile, isWhatsApp });
-
-    // Strategy 1: For WhatsApp, use text-only approach (most reliable)
-    if (isWhatsApp) {
-      if (navigator.share) {
-        // WhatsApp works best with text-only sharing
-        await navigator.share({
-          text: `${shareDescription}\n\n${shareUrl}`,
-          // Don't include title or url fields for WhatsApp
-        });
-        console.log("Shared to WhatsApp successfully");
-        return;
-      }
+    if (isMobile) {
+      // Use WhatsApp's direct URL scheme
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(fullShareText)}`;
+      window.open(whatsappUrl, '_blank');
+      console.log("Opened WhatsApp share");
+      return;
     }
 
-    // Strategy 2: For other mobile apps, try with image
-    if (isMobile && !isWhatsApp) {
-      const imageFile = await prepareImageForSharing(activeImage, property.name);
-      
-      if (navigator.share && navigator.canShare && imageFile && navigator.canShare({ files: [imageFile] })) {
-        try {
-          await navigator.share({
-            title: `${property.name} - ${property.developer}`,
-            text: shareDescription,
-            url: shareUrl,
-            files: [imageFile],
-          });
-          console.log("Shared with image successfully");
-          return;
-        } catch (imageError) {
-          console.log("Image sharing failed, falling back to text", imageError);
-          // Continue to text-only fallback
-        }
-      }
-    }
-
-    // Strategy 3: Universal text sharing for all other cases
+    // For desktop or fallback, use Web Share API
     if (navigator.share) {
       await navigator.share({
         title: `${property.name} - ${property.developer}`,
-        text: `${shareDescription}\n\n${shareUrl}`,
+        text: fullShareText,
         url: shareUrl,
       });
-      console.log("Shared with text successfully");
     } else {
-      // Fallback to clipboard
       await handleClipboardFallback({
         title: `${property.name} - ${property.developer}`,
         text: shareDescription,
@@ -1352,10 +1321,9 @@ const handleShare = async () => {
   } catch (err) {
     if (err instanceof Error && err.name !== "AbortError") {
       console.error('Share failed:', err);
-      const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange}`;
       await handleClipboardFallback({
         title: `${property.name} - ${property.developer}`,
-        text: shareDescription,
+        text: `🏠 ${property.name} in ${property.location} | ${property.priceRange}`,
         url: window.location.href,
       });
     }
