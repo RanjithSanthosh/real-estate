@@ -1285,26 +1285,37 @@ function PropertyHeader({
 
 
 
-// Replace your current handleShare function with this:
 const handleShare = async () => {
   try {
     const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
     const shareUrl = window.location.href;
-    
     const fullShareText = `${shareDescription}\n\n${shareUrl}`;
 
-    // Detect if it's mobile
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
+    // Try different strategies in order of reliability
     if (isMobile) {
-      // Use WhatsApp's direct URL scheme
-      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(fullShareText)}`;
-      window.open(whatsappUrl, '_blank');
-      console.log("Opened WhatsApp share");
-      return;
+      // Strategy 1: Direct WhatsApp URL (most reliable for WhatsApp)
+      if (navigator.userAgent.includes('WhatsApp') || confirm('Open in WhatsApp?')) {
+        const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(fullShareText)}`;
+        window.location.href = whatsappUrl;
+        return;
+      }
+
+      // Strategy 2: Web Share API with text-only for WhatsApp
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            text: fullShareText,
+          });
+          return;
+        } catch (shareError) {
+          console.log('Web Share failed, trying alternative');
+        }
+      }
     }
 
-    // For desktop or fallback, use Web Share API
+    // Strategy 3: Standard Web Share for all platforms
     if (navigator.share) {
       await navigator.share({
         title: `${property.name} - ${property.developer}`,
@@ -1312,6 +1323,7 @@ const handleShare = async () => {
         url: shareUrl,
       });
     } else {
+      // Final fallback: clipboard
       await handleClipboardFallback({
         title: `${property.name} - ${property.developer}`,
         text: shareDescription,
@@ -1320,7 +1332,7 @@ const handleShare = async () => {
     }
   } catch (err) {
     if (err instanceof Error && err.name !== "AbortError") {
-      console.error('Share failed:', err);
+      console.error('All sharing methods failed:', err);
       await handleClipboardFallback({
         title: `${property.name} - ${property.developer}`,
         text: `🏠 ${property.name} in ${property.location} | ${property.priceRange}`,
