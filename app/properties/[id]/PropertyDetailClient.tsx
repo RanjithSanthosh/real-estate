@@ -1217,6 +1217,76 @@ function PropertyHeader({
 //   };
 
 
+// const handleShare = async () => {
+//   try {
+//     const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
+    
+//     const shareData = {
+//       title: `${property.name} - ${property.developer}`,
+//       text: shareDescription,
+//       url: window.location.href,
+//     };
+
+//     // Prepare image file for sharing
+//     const imageFile = await prepareImageForSharing(activeImage, property.name);
+
+//     // Check if Web Share API supports files
+//     if (navigator.share && navigator.canShare && imageFile && navigator.canShare({ files: [imageFile] })) {
+//       // Share with image and text
+//       await navigator.share({
+//         ...shareData,
+//         files: [imageFile],
+//       });
+//       console.log("Property shared successfully with image!");
+//     } 
+//     // Check if basic Web Share API is available (without files)
+//     else if (navigator.share) {
+//       // Share without image
+//       await navigator.share(shareData);
+//       console.log("Property metadata shared successfully (without image)!");
+//     } else {
+//       // Fallback to clipboard
+//       await handleClipboardFallback(shareData);
+//     }
+//   } catch (err) {
+//     if (err instanceof Error && err.name !== "AbortError") {
+//       console.error("Share failed:", err);
+//       const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
+//       await handleClipboardFallback({
+//         title: `${property.name} - ${property.developer}`,
+//         text: shareDescription,
+//         url: window.location.href,
+//       });
+//     }
+//   }
+// };
+
+// // Add this function to prepare image for sharing
+// const prepareImageForSharing = async (imageUrl: string, propertyName: string): Promise<File | null> => {
+//   try {
+//     // Fetch the image
+//     const response = await fetch(imageUrl);
+//     if (!response.ok) throw new Error('Failed to fetch image');
+    
+//     const blob = await response.blob();
+    
+//     // Create a File object from the blob
+//     const file = new File([blob], 
+//       `${propertyName.replace(/\s+/g, '_')}_property.jpg`, 
+//       { type: blob.type || 'image/jpeg' }
+//     );
+    
+//     return file;
+//   } catch (error) {
+//     console.warn('Could not prepare image for sharing:', error);
+//     return null;
+//   }
+// };
+
+
+
+// Replace your current handleShare function with this:
+
 const handleShare = async () => {
   try {
     const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
@@ -1230,27 +1300,31 @@ const handleShare = async () => {
     // Prepare image file for sharing
     const imageFile = await prepareImageForSharing(activeImage, property.name);
 
-    // Check if Web Share API supports files
-    if (navigator.share && navigator.canShare && imageFile && navigator.canShare({ files: [imageFile] })) {
-      // Share with image and text
-      await navigator.share({
-        ...shareData,
-        files: [imageFile],
-      });
-      console.log("Property shared successfully with image!");
-    } 
-    // Check if basic Web Share API is available (without files)
-    else if (navigator.share) {
-      // Share without image
+    // Strategy 1: Try sharing with both image and text
+    if (navigator.share && navigator.canShare && imageFile && navigator.canShare({ files: [imageFile], text: shareDescription })) {
+      try {
+        await navigator.share({
+          ...shareData,
+          files: [imageFile],
+        });
+        console.log("Property shared successfully with image and text!");
+        return;
+      } catch (imageShareError) {
+        console.log("Image sharing failed, falling back to text-only");
+      }
+    }
+
+    // Strategy 2: Try text-only sharing (more reliable)
+    if (navigator.share) {
       await navigator.share(shareData);
-      console.log("Property metadata shared successfully (without image)!");
+      console.log("Property metadata shared successfully!");
     } else {
-      // Fallback to clipboard
+      // Strategy 3: Fallback to clipboard
       await handleClipboardFallback(shareData);
     }
   } catch (err) {
     if (err instanceof Error && err.name !== "AbortError") {
-      console.error("Share failed:", err);
+      console.error('Share failed:', err);
       const shareDescription = `🏠 ${property.name} in ${property.location} | ${property.priceRange} | ${property.specs.map((spec) => spec.text).join(" • ")}`;
       await handleClipboardFallback({
         title: `${property.name} - ${property.developer}`,
@@ -1261,16 +1335,14 @@ const handleShare = async () => {
   }
 };
 
-// Add this function to prepare image for sharing
+// Keep your existing prepareImageForSharing function
 const prepareImageForSharing = async (imageUrl: string, propertyName: string): Promise<File | null> => {
   try {
-    // Fetch the image
     const response = await fetch(imageUrl);
     if (!response.ok) throw new Error('Failed to fetch image');
     
     const blob = await response.blob();
     
-    // Create a File object from the blob
     const file = new File([blob], 
       `${propertyName.replace(/\s+/g, '_')}_property.jpg`, 
       { type: blob.type || 'image/jpeg' }
