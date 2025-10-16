@@ -2293,7 +2293,7 @@ export default function PropertyDetailClient({
     );
 }
 
-// --- SUB-COMPONENT: PROPERTY HEADER (UI RESTORED) ---
+// --- SUB-COMPONENT: PROPERTY HEADER (CORRECTED FOR MOBILE BACKGROUND) ---
 function PropertyHeader({
     property,
     developer,
@@ -2397,8 +2397,8 @@ function PropertyHeader({
                 title={`Check out: ${property.name}`}
             />
             
-            {/* ✨ FIXED: Restored original className to fix the layout */}
-            <div ref={propertyDetailsRef} className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            {/* ✨ ADDED 'bg-white' to ensure a solid white background for the capture */}
+            <div ref={propertyDetailsRef} className="grid grid-cols-1 lg:grid-cols-5 gap-8 bg-white">
                 <div className="lg:col-span-3">
                     <div className="relative w-full h-[300px] md:h-[500px] rounded-xl overflow-hidden shadow-lg mb-4">
                         <Image
