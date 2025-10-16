@@ -2219,7 +2219,7 @@
 // app/properties/[id]/PropertyDetailClient.tsx
 "use client";
 
-import React, { useState, useMemo, useEffect, useRef } from "react"; // ✨ Import useRef
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -2251,8 +2251,6 @@ import {
 import { useFavorites } from "../../context/FavoritesContext";
 import { toast } from "react-hot-toast";
 import { Icon, IconName } from "@/components/shared/IconMapper";
-
-// ✨ Import html-to-image library
 import { toPng } from 'html-to-image';
 
 
@@ -2295,7 +2293,7 @@ export default function PropertyDetailClient({
     );
 }
 
-// --- SUB-COMPONENT: PROPERTY HEADER (UPDATED FOR HTML-TO-IMAGE WITH LINK) ---
+// --- SUB-COMPONENT: PROPERTY HEADER (UI RESTORED) ---
 function PropertyHeader({
     property,
     developer,
@@ -2308,9 +2306,12 @@ function PropertyHeader({
     const { addFavorite, removeFavorite, isFavorite } = useFavorites();
     const isFav = isFavorite(property.id);
     const propertyDetailsRef = useRef<HTMLDivElement>(null);
-
-    // ✨ State to manage the visibility of the link overlay during capture
     const [isCapturing, setIsCapturing] = useState(false);
+    const [shareUrl, setShareUrl] = useState('');
+
+    useEffect(() => {
+        setShareUrl(window.location.href);
+    }, []);
 
     const dataURLtoFile = (dataurl: string, filename: string): File | null => {
         if (!dataurl || !filename) return null;
@@ -2332,7 +2333,6 @@ function PropertyHeader({
         }
     };
 
-    // ✨ Updated function to generate image (with link) and handle sharing
     const generateAndShareImage = async () => {
         if (!propertyDetailsRef.current) {
             toast.error("Could not capture property details.");
@@ -2340,16 +2340,14 @@ function PropertyHeader({
         }
 
         toast.loading("Preparing image...", { id: "shareToast" });
-        setIsCapturing(true); // Show the link overlay
+        setIsCapturing(true);
 
-        // Short delay to ensure the DOM updates before capturing
         await new Promise(resolve => setTimeout(resolve, 100));
 
         try {
             const dataUrl = await toPng(propertyDetailsRef.current, { quality: 0.95 });
             const shareTitle = `Check out this property: ${property.name}`;
             const shareText = `🏠 Explore ${property.name} in ${property.location}.`;
-            const shareUrl = window.location.href;
             const imageFile = dataURLtoFile(dataUrl, `${property.name.replace(/\s/g, '_')}_property.png`);
             
             const shareData: ShareData = {
@@ -2374,7 +2372,7 @@ function PropertyHeader({
             console.error("Error during image generation or sharing:", error);
             toast.error("Failed to share property image.", { id: "shareToast" });
         } finally {
-            setIsCapturing(false); // Hide the link overlay after capture
+            setIsCapturing(false);
         }
     };
 
@@ -2395,11 +2393,12 @@ function PropertyHeader({
             <ShareModal
                 isOpen={isShareModalOpen}
                 onClose={() => setIsShareModalOpen(false)}
-                url={window.location.href}
+                url={shareUrl}
                 title={`Check out: ${property.name}`}
             />
             
-            <div ref={propertyDetailsRef} className="grid grid-cols-1 lg:grid-cols-5 gap-8 bg-white p-4 rounded-xl">
+            {/* ✨ FIXED: Restored original className to fix the layout */}
+            <div ref={propertyDetailsRef} className="grid grid-cols-1 lg:grid-cols-5 gap-8">
                 <div className="lg:col-span-3">
                     <div className="relative w-full h-[300px] md:h-[500px] rounded-xl overflow-hidden shadow-lg mb-4">
                         <Image
@@ -2410,7 +2409,6 @@ function PropertyHeader({
                             priority
                         />
                         <div className="absolute top-4 right-4 flex space-x-2">
-                            {/* Hide share/print buttons during capture to keep the image clean */}
                             {!isCapturing && (
                                 <>
                                     <motion.button
@@ -2442,14 +2440,13 @@ function PropertyHeader({
                                 </>
                             )}
                         </div>
-                        {/* ✨ This is the link overlay that gets captured in the image */}
                         {isCapturing && (
                             <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-center">
                                 <p className="text-white font-semibold text-sm drop-shadow-md">
                                     For more details, visit:
                                 </p>
                                 <p className="text-white text-xs mt-1 drop-shadow-md font-mono">
-                                    {window.location.href}
+                                    {shareUrl}
                                 </p>
                             </div>
                         )}
@@ -2498,21 +2495,23 @@ function PropertyHeader({
                             {property.priceRange}
                         </p>
                     </div>
-                    <div className="flex flex-col sm:flex-row gap-4 mt-6">
-                        <button className="flex-1 bg-white text-green-600 border-2 border-green-500 font-bold py-3 px-6 rounded-3xl hover:bg-green-50 transition w-full sm:w-auto">
-                            Download Brochure
-                        </button>
-                        <button className="flex-1 bg-green-500 text-white font-bold py-3 px-6 rounded-3xl hover:bg-green-600 transition flex items-center justify-center gap-2 w-full sm:w-auto">
-                            <Phone size={18} /> Call Us
-                        </button>
-                    </div>
+                    {!isCapturing && (
+                        <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                            <button className="flex-1 bg-white text-green-600 border-2 border-green-500 font-bold py-3 px-6 rounded-3xl hover:bg-green-50 transition w-full sm:w-auto">
+                                Download Brochure
+                            </button>
+                            <button className="flex-1 bg-green-500 text-white font-bold py-3 px-6 rounded-3xl hover:bg-green-600 transition flex items-center justify-center gap-2 w-full sm:w-auto">
+                                <Phone size={18} /> Call Us
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </>
     );
 }
 
-// --- SHARE MODAL (Unchanged - for desktop fallback) ---
+// --- SHARE MODAL (Unchanged) ---
 function ShareModal({ isOpen, onClose, url, title }: { isOpen: boolean; onClose: () => void; url: string; title: string; }) {
   if (!isOpen) return null;
   const copyToClipboard = () => {
