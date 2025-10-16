@@ -2823,7 +2823,7 @@ function MobileNav({
           className="fixed top-0 right-0 h-full w-full max-w-sm bg-gray-900/90 backdrop-blur-md z-50 p-6 flex flex-col lg:hidden"
         >
           <div className="flex justify-between items-center mb-10">
-            <Image src={logoImage} alt="Logo" width={120} height={40} />
+            <Image src={logoImage} alt="Logo" width={170} height={37} />
             <button onClick={onClose} className="text-white p-2">
               <X size={28} />
             </button>
@@ -3135,8 +3135,8 @@ export default function Hero({
             <Image
               src={logoImage}
               alt="Home Konnect Logo"
-              width={120}
-              height={40}
+              width={170}
+              height={37}
             />
           </div>
 
