@@ -1,10 +1,11 @@
+'use client'
 import React from 'react';
 import Navbar from '@/components/shared/Navbar';
 import DetailedFooter from '@/components/aboutPage/DetailedFooter';
 import SiteMapFooter from '@/components/homePage/SiteMapFooter';
 import Link from 'next/link';
 import { FaWhatsapp } from 'react-icons/fa'; // Importing WhatsApp icon
-
+import { useUI } from '../context/UIContext';
 // --- Refactored Reusable Card for Pricing Tiers (Buying/Selling) ---
 interface PriceCardProps {
   category: string;
@@ -16,6 +17,7 @@ interface PriceCardProps {
 }
 
 function PriceCard({ category, price, priceSuffix, priceDescription, services, buttonIcon = <FaWhatsapp size={20} /> }: PriceCardProps) {
+    const { openConsultationModal } = useUI();
     return (
         <div className="bg-gray-50 border border-gray-200 p-6 rounded-lg flex flex-col justify-between">
             <div>
@@ -35,7 +37,7 @@ function PriceCard({ category, price, priceSuffix, priceDescription, services, b
                     ))}
                 </ul>
             </div>
-            <button className="w-full bg-black text-white py-3 px-6 mt-6 rounded-lg font-bold text-base hover:bg-gray-800 transition-colors flex items-center justify-center gap-3">
+            <button onClick={openConsultationModal} className="w-full bg-black text-white py-3 px-6 mt-6 rounded-lg font-bold text-base hover:bg-gray-800 transition-colors flex items-center justify-center gap-3">
                 {buttonIcon}
                 KNOW MORE
             </button>
@@ -55,6 +57,7 @@ interface RentingLeasingCardProps {
 }
 
 function RentingLeasingCard({ category, priceMain, priceSub, priceDescription, lessorServices, lesseeServices, buttonIcon = <FaWhatsapp size={20} /> }: RentingLeasingCardProps) {
+    const { openConsultationModal } = useUI();
     return (
         <div className="bg-gray-50 border border-gray-200 p-6 rounded-lg flex flex-col justify-between">
             <div>
@@ -86,7 +89,7 @@ function RentingLeasingCard({ category, priceMain, priceSub, priceDescription, l
                     ))}
                 </ul>
             </div>
-            <button className="w-full bg-black text-white py-3 px-6 mt-6 rounded-lg font-bold text-base hover:bg-gray-800 transition-colors flex items-center justify-center gap-3">
+            <button  onClick={openConsultationModal} className="w-full bg-black text-white py-3 px-6 mt-6 rounded-lg font-bold text-base hover:bg-gray-800 transition-colors flex items-center justify-center gap-3">
                 {buttonIcon}
                 KNOW MORE
             </button>
@@ -96,6 +99,7 @@ function RentingLeasingCard({ category, priceMain, priceSub, priceDescription, l
 
 // --- Main Page Component ---
 export default function PricingPage() {
+    
     // Data for the pricing cards
     const buyingData = [
         { category: 'BUYERS (NEW)', price: '0', priceSuffix: '%', priceDescription: 'ON SALE PRICE', services: ['NO FEES for buying New properties/projects', 'Unlimited Site Visits', 'Research advice on best projects & localities', 'Professional advice for best ROI', 'NRI/HNI specific advice', 'Assistance with Bank Loans', 'Post Sale Assistance'] },
