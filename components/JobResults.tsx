@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
+import Link from 'next/link';
 import {
   ChevronDown,
   ChevronUp,
@@ -17,23 +18,7 @@ import {
   ClipboardList,
   X as CloseIcon,
 } from "lucide-react";
-
-// --- 1. PROPS INTERFACE & DATA STRUCTURE ---
-interface JobCardProps {
-  title: string;
-  openings: number;
-  salary: string;
-  location: string;
-  experience: string;
-  gender: string;
-  jobType: string;
-  department: string;
-  summary: string;
-  description?: string[];
-  qualifications?: string[];
-  requirements?: string[];
-  perks?: string[];
-}
+import { Job, jobsData } from "@/app/data/jobs";
 
 interface Filters {
   location: string;
@@ -42,9 +27,7 @@ interface Filters {
   salaryRange: string;
 }
 
-// --- 2. REUSABLE SUB-COMPONENTS ---
-
-// Reusable Select Component for dropdowns
+// --- Reusable Select Component for dropdowns ---
 const CustomSelect = ({
   label,
   value,
@@ -78,7 +61,7 @@ const CustomSelect = ({
   </div>
 );
 
-// Renders a single detail item (e.g., Openings: 2)
+// --- Renders a single detail item (e.g., Openings: 2) ---
 const DetailItem = ({
   icon: Icon,
   text,
@@ -92,7 +75,7 @@ const DetailItem = ({
   </div>
 );
 
-// Renders a section in the expandable area (e.g., Job Description)
+// --- Renders a section in the expandable area ---
 const DetailSection = ({
   icon: Icon,
   title,
@@ -124,7 +107,7 @@ const DetailSection = ({
   );
 };
 
-// --- 3. THE NEW JOB FILTERS COMPONENT ---
+// --- Job Filters Component ---
 const JobFilters = ({
   filters,
   onFilterChange,
@@ -193,8 +176,8 @@ const JobFilters = ({
   );
 };
 
-// --- 4. THE MAIN JOB CARD COMPONENT ---
-const JobCard = (props: JobCardProps) => {
+// --- Main Job Card Component ---
+const JobCard = (props: Job) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -236,9 +219,13 @@ const JobCard = (props: JobCardProps) => {
             {open ? "Hide Details" : "View Details"}
             {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
-          <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold">
-            Apply Now
-          </button>
+          
+          {/* ✅ UPDATED: This button is now a Link to the dynamic apply page */}
+          <Link href={`/apply/${props.id}`}>
+            <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold">
+              Apply Now
+            </button>
+          </Link>
         </div>
       </div>
 
@@ -250,7 +237,6 @@ const JobCard = (props: JobCardProps) => {
             title="Job Description"
             items={props.description}
           />
-
           <div className="grid md:grid-cols-2 gap-8 mt-6">
             <DetailSection
               icon={ClipboardList}
@@ -263,7 +249,6 @@ const JobCard = (props: JobCardProps) => {
               items={props.requirements}
             />
           </div>
-
           <div className="mt-6">
             <DetailSection
               icon={Sparkles}
@@ -271,19 +256,13 @@ const JobCard = (props: JobCardProps) => {
               items={props.perks}
             />
           </div>
-
-            {/* <div className="mt-8 border-t border-gray-200 pt-6">
-              <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold">
-                Apply Now
-              </button>
-            </div> */}
         </div>
       )}
     </div>
   );
 };
 
-// --- 5. THE EXPORTED PAGE COMPONENT ---
+// --- Main Exported Component ---
 export default function JobResults() {
   const [filters, setFilters] = useState<Filters>({
     location: "All",
@@ -291,135 +270,6 @@ export default function JobResults() {
     jobType: "All",
     salaryRange: "All",
   });
-
-  const jobsData: JobCardProps[] = [
-    {
-      title: "Pre-Sales Executive",
-      department: "Pre-Sales",
-      openings: 2,
-      salary: "₹ 2 L – ₹ 2.2 L P.A",
-      location: "Chennai",
-      experience: "2 Yrs",
-      gender: "Female",
-      jobType: "Part Time",
-      summary:
-        "Home Konnect® is looking for candidates with prior telecalling and customer handling experience",
-      description: [
-        "Candidates with prior telecalling and customer handling experience would be given higher preference",
-        "Good interpersonal skills and negotiation skills",
-        "Should be enthusiastic / result-oriented / assertive/ street-smart",
-        "Meeting Targets and Deadlines consistently",
-        "Handling international & local clientele to solve their queries and support the sales function",
-        "Assist clients during the decision making process by answering all relevant queries, liaising with Developer or the Company’s Developer Relations team for any clarifications required and home loan requirements",
-        "Experience in Real Estate/Banking/Financial/Insurance domains is an added advantage",
-      ],
-      qualifications: [
-        "Fluent written and verbal communication in Tamil and English",
-        "Familiar with MS Office",
-      ],
-      requirements: [
-        "Should be willing to work during all weekend(s) with one weekday off per week",
-        "Prior experience of 1–5 years in Sales/TeleSales",
-        "Should be enthusiastic / result-oriented / assertive / street-smart",
-      ],
-      perks: ["Good incentives"],
-    },
-    {
-      title: "Senior Sales Manager",
-      department: "Sales",
-      openings: 1,
-      salary: "₹ 5 L – ₹ 7 L P.A",
-      location: "Bengaluru",
-      experience: "5+ Yrs",
-      gender: "Any",
-      jobType: "Full Time",
-      summary:
-        "We are seeking an experienced sales manager to lead our Bengaluru team and drive growth.",
-            description: [
-        "Candidates with prior telecalling and customer handling experience would be given higher preference",
-        "Good interpersonal skills and negotiation skills",
-        "Should be enthusiastic / result-oriented / assertive/ street-smart",
-        "Meeting Targets and Deadlines consistently",
-        "Handling international & local clientele to solve their queries and support the sales function",
-        "Assist clients during the decision making process by answering all relevant queries, liaising with Developer or the Company’s Developer Relations team for any clarifications required and home loan requirements",
-        "Experience in Real Estate/Banking/Financial/Insurance domains is an added advantage",
-      ],
-      qualifications: [
-        "Fluent written and verbal communication in Tamil and English",
-        "Familiar with MS Office",
-      ],
-      requirements: [
-        "Should be willing to work during all weekend(s) with one weekday off per week",
-        "Prior experience of 1–5 years in Sales/TeleSales",
-        "Should be enthusiastic / result-oriented / assertive / street-smart",
-      ],
-      perks: ["Good incentives"],
-    },
-    
-    {
-      title: "Digital Marketing Intern",
-      department: "Marketing",
-      openings: 3,
-      salary: "Stipend based",
-      location: "Chennai",
-      experience: "0-1 Yrs",
-      gender: "Any",
-      jobType: "Internship",
-      summary:
-        "Join our marketing team to learn and contribute to our digital presence and campaigns.",
-      description: [
-        "Candidates with prior telecalling and customer handling experience would be given higher preference",
-        "Good interpersonal skills and negotiation skills",
-        "Should be enthusiastic / result-oriented / assertive/ street-smart",
-        "Meeting Targets and Deadlines consistently",
-        "Handling international & local clientele to solve their queries and support the sales function",
-        "Assist clients during the decision making process by answering all relevant queries, liaising with Developer or the Company’s Developer Relations team for any clarifications required and home loan requirements",
-        "Experience in Real Estate/Banking/Financial/Insurance domains is an added advantage",
-      ],
-      qualifications: [
-        "Fluent written and verbal communication in Tamil and English",
-        "Familiar with MS Office",
-      ],
-      requirements: [
-        "Should be willing to work during all weekend(s) with one weekday off per week",
-        "Prior experience of 1–5 years in Sales/TeleSales",
-        "Should be enthusiastic / result-oriented / assertive / street-smart",
-      ],
-      perks: ["Good incentives"],
-      
-    },
-    {
-      title: "Pre-Sales Executive",
-      department: "Pre-Sales",
-      openings: 2,
-      salary: "₹ 2 L – ₹ 2.2 L P.A",
-      location: "Chennai",
-      experience: "2 Yrs",
-      gender: "Female",
-      jobType: "Part Time",
-      summary:
-        "Home Konnect® is looking for candidates with prior telecalling and customer handling experience",
-      description: [
-        "Candidates with prior telecalling and customer handling experience would be given higher preference",
-        "Good interpersonal skills and negotiation skills",
-        "Should be enthusiastic / result-oriented / assertive/ street-smart",
-        "Meeting Targets and Deadlines consistently",
-        "Handling international & local clientele to solve their queries and support the sales function",
-        "Assist clients during the decision making process by answering all relevant queries, liaising with Developer or the Company’s Developer Relations team for any clarifications required and home loan requirements",
-        "Experience in Real Estate/Banking/Financial/Insurance domains is an added advantage",
-      ],
-      qualifications: [
-        "Fluent written and verbal communication in Tamil and English",
-        "Familiar with MS Office",
-      ],
-      requirements: [
-        "Should be willing to work during all weekend(s) with one weekday off per week",
-        "Prior experience of 1–5 years in Sales/TeleSales",
-        "Should be enthusiastic / result-oriented / assertive / street-smart",
-      ],
-      perks: ["Good incentives"],
-    },
-  ];
 
   const handleFilterChange = (filterName: keyof Filters, value: string) => {
     setFilters((prev) => ({ ...prev, [filterName]: value }));
@@ -437,7 +287,7 @@ export default function JobResults() {
         filters.department === "All" || job.department === filters.department;
       const jobTypeMatch =
         filters.jobType === "All" || job.jobType === filters.jobType;
-      // Note: Salary range filtering would require more complex logic to parse and compare ranges
+      // Note: Salary range filtering would require more complex logic
       return locationMatch && departmentMatch && jobTypeMatch;
     });
   }, [filters]);
@@ -455,7 +305,7 @@ export default function JobResults() {
         </h1>
         <div className="space-y-6">
           {filteredJobs.length > 0 ? (
-            filteredJobs.map((job, i) => <JobCard key={i} {...job} />)
+            filteredJobs.map((job) => <JobCard key={job.id} {...job} />)
           ) : (
             <div className="text-center py-16 bg-white border rounded-lg">
               <p className="text-gray-600">

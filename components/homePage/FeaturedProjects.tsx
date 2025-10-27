@@ -1,7 +1,3 @@
-
-
-
-
 // "use client";
 
 // import Image from "next/image";
@@ -41,9 +37,9 @@
 //   // };
 
 //    const handleFavoriteToggle = (e: React.MouseEvent) => {
-//     e.preventDefault(); 
+//     e.preventDefault();
 //     e.stopPropagation();
-    
+
 //     // Step 2: Use the toast function
 //     if (isFav) {
 //       removeFavorite(property.id);
@@ -119,15 +115,15 @@
 //             >
 //               <Car size={20} />
 //             </motion.button>
-            
+
 //             {/* CORRECTED FAVORITE BUTTON */}
 //             <motion.button
 //               onClick={handleFavoriteToggle}
 //               whileHover={{ scale: 1.1 }}
 //               className="bg-white/90 backdrop-blur-md p-2.5 rounded-full shadow-sm"
 //             >
-//               <Heart 
-//                 size={20} 
+//               <Heart
+//                 size={20}
 //                 className={isFav ? 'text-red-500' : 'text-gray-700'}
 //                 fill={isFav ? 'currentColor' : 'none'}
 //               />
@@ -265,9 +261,6 @@
 //   );
 // }
 
-
-
-
 "use client";
 
 import Image from "next/image";
@@ -357,6 +350,7 @@ const ProjectCard = ({ property }: { property: Property }) => {
             />
           </motion.div>
 
+
           {/* Floating Icons */}
           <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex gap-2">
             <motion.button
@@ -364,7 +358,7 @@ const ProjectCard = ({ property }: { property: Property }) => {
               whileHover={{ scale: 1.1 }}
               className="bg-white/90 backdrop-blur-md p-2 rounded-full shadow-sm sm:p-2.5"
             >
-              <Car size={18} className="sm:size-20" />
+              <Car size={16} className="text-gray-700" />
             </motion.button>
             <motion.button
               onClick={handleFavoriteToggle}
@@ -454,7 +448,11 @@ export default function FeaturedProjects() {
 
   const gridItemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { ease: "easeOut", duration: 0.5 } },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { ease: "easeOut", duration: 0.5 },
+    },
   };
 
   return (
@@ -466,7 +464,10 @@ export default function FeaturedProjects() {
     >
       <div className="container mx-auto px-4 sm:px-6">
         {/* Section Header */}
-        <motion.div variants={gridItemVariants} className="text-center mb-8 sm:mb-12">
+        <motion.div
+          variants={gridItemVariants}
+          className="text-center mb-8 sm:mb-12"
+        >
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800">
             Featured Projects Across All Cities
           </h2>
@@ -491,17 +492,17 @@ export default function FeaturedProjects() {
           ))}
         </motion.div>
 
-         {/* View All Button */}
-         <motion.div variants={gridItemVariants} className="text-center mt-14">
-           <Link href="/search">
-             <motion.button
-               whileHover={{ scale: 1.05 }}
-               className="border border-gray-300 text-gray-700 font-semibold py-2.5 px-6 rounded-full flex items-center gap-2 mx-auto"
-             >
-               View All <SquareArrowOutUpRight size={16} />
-             </motion.button>
-           </Link>
-         </motion.div>
+        {/* View All Button */}
+        <motion.div variants={gridItemVariants} className="text-center mt-14">
+          <Link href="/search">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              className="border border-gray-300 text-gray-700 font-semibold py-2.5 px-6 rounded-full flex items-center gap-2 mx-auto"
+            >
+              View All <SquareArrowOutUpRight size={16} />
+            </motion.button>
+          </Link>
+        </motion.div>
       </div>
     </motion.section>
   );

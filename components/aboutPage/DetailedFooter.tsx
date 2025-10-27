@@ -1,6 +1,6 @@
 // components/aboutPage/DetailedFooter.tsx
 "use client";
-
+import Link from "next/link";
 import Image from "next/image";
 import {
   Mail,
@@ -198,13 +198,13 @@ export default function DetailedFooter() {
               HomeKonnect®.com {currentYear}. All rights reserved.
             </p>
             <div className="flex items-center justify-center space-x-4">
-              <a href="#" className="hover:text-green-500 transition-colors">
+              <Link href="/privacy-policy" className="hover:text-green-500 transition-colors">
                 Privacy Policy
-              </a>
+              </Link>
               <span className="text-gray-600">|</span>
-              <a href="#" className="hover:text-green-500 transition-colors">
+              <Link href="/terms-of-use" className="hover:text-green-500 transition-colors">
                 Terms Of Use
-              </a>
+              </Link>
               <span className="text-gray-600">|</span>
               <a href="#" className="hover:text-green-500 transition-colors">
                 Site Map

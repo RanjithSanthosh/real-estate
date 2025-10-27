@@ -9,15 +9,56 @@ interface ConsultationModalProps {
   onClose: () => void;
 }
 
+interface FormErrors {
+  name?: string;
+  email?: string;
+  phoneNumber?: string;
+}
+
 export default function ConsultationModal({ onClose }: ConsultationModalProps) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  // Validation function
+  const validateForm = (): FormErrors => {
+    const newErrors: FormErrors = {};
+    
+    if (!name.trim()) {
+      newErrors.name = "Name is required.";
+    }
+    
+    if (!email.trim()) {
+      newErrors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Email address is invalid.";
+    }
+    
+    if (!phoneNumber.trim()) {
+      newErrors.phoneNumber = "Phone number is required.";
+    } else if (!/^\d{10}$/.test(phoneNumber)) {
+      newErrors.phoneNumber = "Phone number must be 10 digits.";
+    }
+    
+    return newErrors;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic
-    onClose();
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
+    
+    // If there are no errors, proceed with submission
+    if (Object.keys(validationErrors).length === 0) {
+      console.log("Form Submitted:", { name, email, phoneNumber });
+      // Handle successful submission logic (e.g., send to API)
+      onClose(); // Close the modal
+    }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40  z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col relative" onClick={(e) => e.stopPropagation()}>
         {/* Header Section */}
         <div className="bg-green-600 p-6 text-center rounded-t-2xl">
@@ -32,39 +73,55 @@ export default function ConsultationModal({ onClose }: ConsultationModalProps) {
         </div>
 
         {/* Form Section */}
-        <form onSubmit={handleSubmit} className="p-8 space-y-4">
-          <input
-            type="text"
-            placeholder="Name"
-            className="w-full p-3 border border-gray-300 rounded-2xl focus:ring-green-500 focus:border-green-500"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full p-3 border border-gray-300 rounded-2xl focus:ring-green-500 focus:border-green-500"
-            required
-          />
-          <div className="flex">
-            <span className="inline-flex items-center px-3 text-gray-500 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg">
-              91 +
-            </span>
+        <form onSubmit={handleSubmit} className="p-8 space-y-4" noValidate>
+          <div>
             <input
-              type="tel"
-              placeholder="Phone Number"
-              className="flex-grow p-3 border border-gray-300 rounded-r-2xl focus:ring-green-500 focus:border-green-500"
-              required
+              type="text"
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={`w-full p-3 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-2xl focus:ring-green-500 focus:border-green-500`}
             />
+            {errors.name && <p className="text-red-500 text-xs mt-1 ml-2">{errors.name}</p>}
           </div>
+          
+          <div>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={`w-full p-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-2xl focus:ring-green-500 focus:border-green-500`}
+            />
+            {errors.email && <p className="text-red-500 text-xs mt-1 ml-2">{errors.email}</p>}
+          </div>
+          
+          <div>
+            <div className="flex">
+              <span className="inline-flex items-center px-3 text-gray-500 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg">
+                91 +
+              </span>
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className={`flex-grow p-3 border ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300'} rounded-r-2xl focus:ring-green-500 focus:border-green-500`}
+              />
+            </div>
+            {errors.phoneNumber && <p className="text-red-500 text-xs mt-1 ml-2">{errors.phoneNumber}</p>}
+          </div>
+          
           <button
             type="submit"
             className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-2xl hover:bg-green-700 transition-colors"
           >
             Book Now
           </button>
+          
            <p className="text-xs text-center text-gray-500 pt-2">
-              By proceeding, you agree with our <a href="#" className="text-green-600 underline">Privacy Policy</a> and <a href="#" className="text-green-600 underline">Terms Of Use</a>
-            </p>
+             By proceeding, you agree with our <a href="/privacy-policy" className="text-green-600 underline">Privacy Policy</a> and <a href="/terms-of-use" className="text-green-600 underline">Terms Of Use</a>
+           </p>
         </form>
       </div>
     </div>
