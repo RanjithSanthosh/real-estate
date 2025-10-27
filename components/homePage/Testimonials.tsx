@@ -123,7 +123,7 @@
 
 import Image from "next/image";
 import { Play, X } from "lucide-react";
-import React, { useState } from "react"; // ✅ Import useState
+import React, { useState, useEffect } from "react";
 import { motion, Variants, AnimatePresence } from "framer-motion";
 
 import {
@@ -139,36 +139,6 @@ interface Testimonial {
   videoUrl: string;
 }
 
-// ✅ Updated with real YouTube video IDs and thumbnails
-const testimonials: Testimonial[] = [
-  // {
-  //   thumbnailUrl: 'https://img.youtube.com/vi/g-S8fS9Q-pI/hqdefault.jpg',
-  //   videoUrl: 'https://www.youtube.com/embed/g-S8fS9Q-pI?autoplay=1',
-  // },
-  // {
-  //   thumbnailUrl: 'https://img.youtube.com/vi/Nqg-dYc-A8U/hqdefault.jpg',
-  //   videoUrl: 'https://www.youtube.com/embed/Nqg-dYc-A8U?autoplay=1',
-  // },
-  // {
-  //   thumbnailUrl: 'https://img.youtube.com/vi/L_LUpnjgPso/hqdefault.jpg',
-  //   videoUrl: 'https://www.youtube.com/embed/L_LUpnjgPso?autoplay=1',
-  // },
-
-  {
-    thumbnailUrl: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1",
-  },
-  {
-    thumbnailUrl: "https://img.youtube.com/vi/kXYiU_JCYtU/hqdefault.jpg",
-    videoUrl: "https://www.youtube.com/embed/kXYiU_JCYtU?autoplay=1",
-  },
-  {
-    thumbnailUrl: "https://img.youtube.com/vi/3JZ_D3ELwOQ/hqdefault.jpg",
-    videoUrl: "https://www.youtube.com/embed/3JZ_D3ELwOQ?autoplay=1",
-  },
-];
-
-// --- ✅ New Video Modal Component ---
 interface VideoModalProps {
   videoUrl: string;
   onClose: () => void;
@@ -177,7 +147,7 @@ interface VideoModalProps {
 const VideoModal = ({ videoUrl, onClose }: VideoModalProps) => {
   return (
     <>
-      {/* Backdrop */}
+      {/* Dimmed backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -185,7 +155,7 @@ const VideoModal = ({ videoUrl, onClose }: VideoModalProps) => {
         className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50"
         onClick={onClose}
       />
-      {/* Modal Content */}
+      {/* Video container */}
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -215,8 +185,43 @@ const VideoModal = ({ videoUrl, onClose }: VideoModalProps) => {
 };
 
 export default function Testimonials() {
-  // ✅ State to manage which video is selected
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
+   const fetchSiteData = async () => {
+      try {
+        const siteData = await (window as any).site_data;
+        const videoData = siteData?.testimonial_video_links || [];
+
+        // Map the fetched YouTube data to your component format
+        const mappedData = videoData.map((item: any) => {
+          let embedUrl = "";
+          try {
+            const videoId = item.youtube_link?.embed_url?.split("v=")[1];
+            embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&origin=https://homekonnect.com&color=white`;
+            console.log("Embed URL:", embedUrl);  
+          } catch (err) {
+            console.error("Invalid YouTube link", err);
+          }
+
+          return {
+            thumbnailUrl: item.youtube_link?.thumbnail_url || "",
+            videoUrl: embedUrl,
+          };
+        });
+
+        setTestimonials(mappedData);
+        console.log("Fetched testimonials:", mappedData);
+      } catch (error) {
+        console.error("Error fetching testimonials:", error);
+      }
+    };
+
+  // ✅ Fetch data dynamically from window.site_data like HomeKonnect logic
+  useEffect(() => {
+   
+console.log("Fetching site data for testimonials...");
+    fetchSiteData();
+  }, []);
 
   // Animation variants
   const containerVariants: Variants = {
@@ -233,6 +238,9 @@ export default function Testimonials() {
     },
   };
 
+  // If no data, render nothing
+  if (!testimonials || testimonials.length === 0) return null;
+
   return (
     <>
       <motion.section
@@ -248,7 +256,7 @@ export default function Testimonials() {
               Testimonials
             </h2>
             <p className="text-gray-500 mt-2">
-              We swear by this quote by Zig Ziglar -{" "}
+              We swear by this quote by Zig Ziglar —{" "}
               <span className="text-yellow-600 font-medium">
                 Stop Selling. Start Helping
               </span>
@@ -267,7 +275,6 @@ export default function Testimonials() {
                 {testimonials.map((testimonial, index) => (
                   <CarouselItem key={index}>
                     <div className="p-2">
-                      {/* ✅ Added onClick handler to open the modal */}
                       <div
                         className="relative aspect-video w-full cursor-pointer group overflow-hidden rounded-xl"
                         onClick={() =>
@@ -278,9 +285,6 @@ export default function Testimonials() {
                           src={testimonial.thumbnailUrl}
                           alt="Testimonial video thumbnail"
                           fill
-                          onError={(e) =>
-                            (e.currentTarget.src = "/fallback-thumbnail.jpg")
-                          }
                           style={{ objectFit: "cover" }}
                           sizes="(max-width: 768px) 100vw, 50vw"
                           className="transition-transform duration-300 group-hover:scale-105"
@@ -312,7 +316,6 @@ export default function Testimonials() {
         </div>
       </motion.section>
 
-      {/* ✅ Render the modal component conditionally */}
       <AnimatePresence>
         {selectedVideoUrl && (
           <VideoModal

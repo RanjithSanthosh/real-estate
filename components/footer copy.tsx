@@ -124,11 +124,11 @@ const Footer = () => {
                             <div>
                                 <h3 className="font-semibold text-white mb-4">Social Links</h3>
                                 <div className="flex flex-wrap gap-2">
-                                    <a href="#" className="p-2.5 bg-gray-800 rounded-full hover:bg-yellow-400 transition-colors"><FaFacebookF className="w-5 h-5"/></a>
-                                    <a href="#" className="p-2.5 bg-gray-800 rounded-full hover:bg-yellow-400 transition-colors"><FaInstagram className="w-5 h-5"/></a>
-                                    <a href="#" className="p-2.5 bg-gray-800 rounded-full hover:bg-yellow-400 transition-colors"><FaLinkedinIn className="w-5 h-5"/></a>
-                                    <a href="#" className="p-2.5 bg-gray-800 rounded-full hover:bg-yellow-400 transition-colors"><FaYoutube className="w-5 h-5"/></a>
-                                    <a href="#" className="p-2.5 bg-gray-800 rounded-full hover:bg-yellow-400 transition-colors"><FaPinterestP className="w-5 h-5"/></a>
+                                    <a href="https://www.facebook.com/homekonnect/" className="p-2.5 bg-gray-800 rounded-full hover:bg-yellow-400 transition-colors"><FaFacebookF className="w-5 h-5"/></a>
+                                    <a href="https://www.instagram.com/home_konnect/?hl=en" className="p-2.5 bg-gray-800 rounded-full hover:bg-yellow-400 transition-colors"><FaInstagram className="w-5 h-5"/></a>
+                                    <a href="https://www.linkedin.com/company/home-konnect/" className="p-2.5 bg-gray-800 rounded-full hover:bg-yellow-400 transition-colors"><FaLinkedinIn className="w-5 h-5"/></a>
+                                    <a href="https://pages.homekonnect.in/youtube" className="p-2.5 bg-gray-800 rounded-full hover:bg-yellow-400 transition-colors"><FaYoutube className="w-5 h-5"/></a>
+                                    <a href="https://in.pinterest.com/homekonnect/" className="p-2.5 bg-gray-800 rounded-full hover:bg-yellow-400 transition-colors"><FaPinterestP className="w-5 h-5"/></a>
                                 </div>
                             </div>
                         </div>

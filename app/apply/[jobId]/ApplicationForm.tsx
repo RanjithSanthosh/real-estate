@@ -178,7 +178,9 @@ export default function ApplicationForm({ job }: { job: Job }) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    // If the field is phone, keep digits only and limit to 10
+    const newValue = name === 'phone' ? value.replace(/\D/g, '').slice(0, 10) : value;
+    setFormData(prev => ({ ...prev, [name]: newValue }));
     // Clear the error for this field when the user starts typing
     if (errors[name as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
@@ -269,6 +271,15 @@ export default function ApplicationForm({ job }: { job: Job }) {
           onChange={handleChange}
           required
           maxLength={10}
+          inputMode="numeric"
+          pattern="[0-9]*"
+          onPaste={(e) => {
+            // sanitize pasted content to digits only
+            const paste = e.clipboardData.getData('Text').replace(/\D/g, '').slice(0, 10);
+            e.preventDefault();
+            setFormData(prev => ({ ...prev, phone: paste }));
+            if (errors.phone) setErrors(prev => ({ ...prev, phone: undefined }));
+          }}
           className={`mt-1 block w-full p-3 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500`}
         />
         {errors.phone && <p className="text-red-500 text-xs mt-1 ml-2">{errors.phone}</p>}

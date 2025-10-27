@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { X, MapPin, Calendar, Clock } from 'lucide-react';
 import { Property } from '../../app/data/properties';
 
@@ -10,10 +10,17 @@ interface ScheduleVisitModalProps {
 }
 
 export default function ScheduleVisitModal({ onClose, property }: ScheduleVisitModalProps) {
+  const [phone, setPhone] = useState(''); // added phone state
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setPhone(digits);
+  };
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission logic here
-    console.log("Scheduling visit for:", property.name);
+    console.log("Scheduling visit for:", property.name, { phone });
     onClose();
   };
 
@@ -46,7 +53,22 @@ export default function ScheduleVisitModal({ onClose, property }: ScheduleVisitM
           <input type="email" placeholder="Email" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500" required />
           <div className="flex">
             <span className="inline-flex items-center px-3 text-gray-500 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg">91 +</span>
-            <input type="tel" placeholder="Phone Number" className="flex-grow p-3 border border-gray-300 rounded-r-lg focus:ring-green-500 focus:border-green-500" required />
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              className="flex-grow p-3 border border-gray-300 rounded-r-lg focus:ring-green-500 focus:border-green-500"
+              required
+              value={phone}
+              onChange={handlePhoneChange}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={10}
+              onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => {
+                const paste = e.clipboardData.getData('Text').replace(/\D/g, '').slice(0, 10);
+                e.preventDefault();
+                setPhone(paste);
+              }}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
