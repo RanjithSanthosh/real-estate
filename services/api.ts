@@ -20,8 +20,8 @@ const INTEGRATION_FIELDS_REF = "homekonnectcms~6e16b01a-1b51-4c1e-a58f-ee604fcec
 const api = axios.create({
   baseURL: API_BASE,
   headers: {
-    'x-c': 'js-7.20.0'
-  }
+    "x-c": "js-7.20.0",
+  },
 });
 
 // ---  1. FUNCTION TO DYNAMICALLY GET THE MASTER REF ---
@@ -46,20 +46,19 @@ async function getMasterRef(): Promise<string> {
   }
 }
 
-// Utility function to build query parameters
 const buildQueryParams = (params: Record<string, any>): string => {
   const searchParams = new URLSearchParams();
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== null && value !== undefined) {
       if (Array.isArray(value)) {
-        value.forEach(v => searchParams.append(key, v));
+        value.forEach((v) => searchParams.append(key, v));
       } else {
         searchParams.append(key, value.toString());
       }
     }
   });
-  
+
   return searchParams.toString();
 };
 
@@ -69,7 +68,7 @@ export async function authorization(): Promise<PrismicApiResponse | null> {
     const response = await api.get<PrismicApiResponse>('');
     return response.data;
   } catch (exception) {
-    console.error("Error Occurred while fetching data for Authorization", exception);
+    console.error("Authorization error", exception);
     return null;
   }
 }
@@ -257,7 +256,7 @@ export async function getCities(pageSize: number = 100) {
     const response = await api.get(`/documents/search?${buildQueryParams(params)}`);
     return response.data;
   } catch (exception) {
-    console.error("Error Occurred while fetching cities", exception);
+    console.error("Cities error", exception);
     return null;
   }
 }

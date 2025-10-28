@@ -44,6 +44,12 @@ export default function ConsultationModal({ onClose }: ConsultationModalProps) {
     return newErrors;
   };
 
+  // Handler that keeps only digits and limits length to 10
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setPhoneNumber(digits);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validateForm();
@@ -103,13 +109,19 @@ export default function ConsultationModal({ onClose }: ConsultationModalProps) {
               </span>
               <input
                 type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={10}
+                autoComplete="tel"
                 placeholder="Phone Number"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                onChange={handlePhoneChange}
                 className={`flex-grow p-3 border ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300'} rounded-r-2xl focus:ring-green-500 focus:border-green-500`}
+                aria-invalid={!!errors.phoneNumber}
+                aria-describedby={errors.phoneNumber ? 'phone-error' : undefined}
               />
             </div>
-            {errors.phoneNumber && <p className="text-red-500 text-xs mt-1 ml-2">{errors.phoneNumber}</p>}
+            {errors.phoneNumber && <p id="phone-error" className="text-red-500 text-xs mt-1 ml-2">{errors.phoneNumber}</p>}
           </div>
           
           <button
