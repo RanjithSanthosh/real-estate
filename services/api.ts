@@ -338,3 +338,86 @@ export async function getBlogByUID(uid: string): Promise<PrismicBlog | null> {
     return null;
   }
 }
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  department: string;
+  image: string;
+  designation?: string;
+  about?: any[];
+}
+
+export interface PrismicOrdering {
+  field: string;
+  direction: string;
+}
+
+/**
+ * Fetches entries from Prismic CMS
+ */
+export async function GetEntriesPrismic(contentType: string, ordering?: PrismicOrdering): Promise<TeamMember[] | null> {
+  try {
+    // Step 1: Fetch the API metadata to get ref and integrationFieldsRef
+    const apiResponse = await fetch(API_BASE);
+    const apiData = await apiResponse.json();
+    
+    // Get the master ref and integrationFieldsRef
+    const masterRef = apiData.refs.find((ref: any) => ref.isMasterRef)?.ref;
+    const integrationFieldsRef = apiData.integrationFieldsRef;
+
+    if (!masterRef || !integrationFieldsRef) {
+      throw new Error('Could not fetch required API references');
+    }
+
+    // Step 2: Construct the search URL with all required parameters
+    const searchParams = new URLSearchParams({
+      q: `[[at(document.type, "${contentType}")]]`,
+      orderings: ordering ? `[${ordering.field} ${ordering.direction}]` : '',
+      pageSize: '100',
+      ref: masterRef,
+      integrationFieldsRef: integrationFieldsRef,
+      'x-c': 'js-7.20.0'
+    });
+
+    const searchUrl = `${API_BASE}/documents/search?${searchParams}`;
+    
+    // Step 3: Fetch the actual data
+    const results = await fetch(searchUrl);
+    const data = await results.json();
+
+    if (data && data.results) {
+      const outputs = data.results.map((p: any) => {
+        const memberData = p.data;
+        const uid = p.uid;
+        return { 
+          ...memberData, 
+          id: uid,
+          // Map the Prismic data to match your TeamMember interface
+          name: memberData.name?.[0]?.text || 'Unknown',
+          department: memberData.job_title || 'General',
+          image: memberData.image_link?.url || '/assets/placeholder.jpg',
+          designation: memberData.designation || ''
+        };
+      });
+      return outputs;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching data from Prismic:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetches team members data (no static fallback)
+ */
+export async function fetchTeamData(): Promise<TeamMember[]> {
+  const prismicResults = await GetEntriesPrismic('team_members', { 
+    field: 'team_members.uid', 
+    direction: 'desc' 
+  });
+  
+  return prismicResults || []; // Return empty array if null
+}
