@@ -30,9 +30,15 @@ export default function ContactPage() {
     const isCheckbox = type === "checkbox";
     const checked = (e.target as HTMLInputElement).checked;
 
+    // If the field is phone, keep digits only and limit to 10
+    const newValue =
+      name === "phone" && type !== "checkbox"
+        ? (value as string).replace(/\D/g, "").slice(0, 10)
+        : value;
+
     setFormData((prevData) => ({
       ...prevData,
-      [name]: isCheckbox ? checked : value,
+      [name]: isCheckbox ? checked : newValue,
     }));
   };
 
@@ -222,6 +228,14 @@ export default function ContactPage() {
                   onChange={handleChange}
                   className="w-3/4 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-600"
                   required
+                  maxLength={10}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => {
+                    const paste = e.clipboardData.getData("Text").replace(/\D/g, "").slice(0, 10);
+                    e.preventDefault();
+                    setFormData(prev => ({ ...prev, phone: paste }));
+                  }}
                 />
               </div>
 

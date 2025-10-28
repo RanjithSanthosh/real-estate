@@ -23,19 +23,21 @@ import narLogo from "../../public/assets/nar.png";
 export default function DetailedFooter() {
   const currentYear = new Date().getFullYear();
 
-  const socialLinks = [
-    { href: "#", icon: Facebook, name: "Facebook" },
-    { href: "#", icon: Instagram, name: "Instagram" },
-    { href: "#", icon: Linkedin, name: "LinkedIn" },
-    { href: "#", icon: Youtube, name: "YouTube" },
-    // { href: "#", icon: Pinterest, name: "Pinterest" },
+   const socialLinks = [
+    { href: "https://www.facebook.com/homekonnect/", icon: Facebook, name: "Facebook" },
+    { href: "https://www.instagram.com/home_konnect/?hl=en", icon: Instagram, name: "Instagram" },
+    { href: "https://www.linkedin.com/company/home-konnect/", icon: Linkedin, name: "LinkedIn" },
+    { href: "https://pages.homekonnect.in/youtube", icon: Youtube, name: "YouTube" },
+    // { href: "https://www.pinterest.com/home_konnect/", icon: Pinterest, name: "Pinterest" },
+
   ];
 
   const contactLinks = [
     { href: "mailto:info@homekonnect.com", icon: Mail, name: "Email" },
-    { href: "tel:+911234567890", icon: Phone, name: "Phone" },
+    { href: "tel:+9199403 66555", icon: Phone, name: "Phone" },
     {
-      href: "https://wa.me/911234567890",
+      href: "https://wa.me/919940366555",
+      text: "I would like to inquire about your services.",
       icon: MessageSquare,
       name: "WhatsApp",
     },
