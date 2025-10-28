@@ -281,9 +281,18 @@ export default function ContactPage() {
                   <option value="" disabled hidden>
                     Select Property Type
                   </option>
-                  <option value="apartment">Apartment</option>
-                  <option value="villa">Villa</option>
-                  <option value="land">Land</option>
+                  <option value="apartment">APARTMENT</option>
+                  <option value="row house">ROW HOUSE</option>
+                  <option value="villa">VILLA</option>
+                  <option value="plot">PLOT</option>
+                  <option value="office space">OFFICE SPACE</option>
+                  <option value="shop/showroom">SHOP/SHOWROOM</option>
+                  <option value="land">LAND</option>
+                  <option value="warehouse/godown">WAREHOUSE/GODOWN</option>
+                  <option value="industrial building">INDUSTRIAL BUILDING</option>
+                  <option value="industrial shed">INDUSTRIAL SHED</option>
+                  <option value="agricultural land">AGRICULTURAL LAND</option>
+                  <option value="farm house">FARM HOUSE</option>
                 </select>
                 <select
                   name="city"
