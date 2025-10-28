@@ -435,3 +435,33 @@ export interface PrismicSearchResponse<T> {
   version?: string;
   license?: string;
 }
+
+export interface PrismicRichText {
+  type: string;
+  text: string;
+  spans: any[];
+  direction?: string;
+}
+
+export interface PrismicBlog {
+  id: string;
+  uid: string | null;
+  type: 'blogs';
+  tags: string[];
+  data: {
+    title: PrismicRichText[];
+    link_title: string;
+    date: string;
+    image_link: {
+      url: string;
+    };
+    // This is an assumption based on your blog detail page UI
+    // It's the main content of the blog post
+    content: PrismicRichText[]; 
+    faq: {
+      question: PrismicRichText[];
+      answer: PrismicRichText[];
+    }[];
+    // Add any other fields you fetch
+  };
+}

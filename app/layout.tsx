@@ -14,7 +14,7 @@ import Link from "next/link";
 import Image from "next/image";
 import DisclaimerManager from "@/components/shared/DisclaimerManager";
 import { FavoritesProvider } from "./context/FavoritesContext"; // ✅ Import the FavoritesProvider
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,37 +47,45 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossOrigin=""
+        />
+        {/* ✅ MARKER CLUSTER CSS (REQUIRED) */}
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/react-leaflet-markercluster@3.0.0-rc1/dist/styles.min.css"
+        />
+          
+      </head>
       <body
         className={`${montserrat.className} ${geistSans.variable} ${geistMono.variable}  antialiased`}
       >
         <UIProvider>
-           <FavoritesProvider>
-             <Toaster /> 
+          <FavoritesProvider>
+            <Toaster />
 
-          {children}
-          <GlobalModal />
-          {/* Floating buttons container: lower z-index, pointer-events-none if property list is open */}
-          <div
-            id="floating-buttons-container"
-            className="fixed bottom-5 right-5 z-30 flex flex-col items-end gap-4"
-          >
-            <FloatingWhatsappButton />
-            <Chatbot />
-          </div>
+            {children}
+            <GlobalModal />
+            {/* Floating buttons container: lower z-index, pointer-events-none if property list is open */}
+            <div
+              id="floating-buttons-container"
+              className="fixed bottom-5 right-5 z-30 flex flex-col items-end gap-4"
+            >
+              <FloatingWhatsappButton />
+              <Chatbot />
+            </div>
 
-          <DisclaimerManager />
-           </FavoritesProvider>
+            <DisclaimerManager />
+          </FavoritesProvider>
         </UIProvider>
       </body>
     </html>
   );
 }
-
-
-
-
-
-
 
 // import type { Metadata } from "next";
 // import {
@@ -94,7 +102,6 @@ export default function RootLayout({
 // import Link from "next/link";
 // import Image from "next/image";
 // import DisclaimerManager from "@/components/shared/DisclaimerManager";
-
 
 // import { AppSidebar } from "@/components/app-sidebar"
 // import {
@@ -170,5 +177,3 @@ export default function RootLayout({
 //     </html>
 //   );
 // }
-
-
