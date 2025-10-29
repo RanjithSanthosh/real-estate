@@ -319,7 +319,7 @@ export async function searchBlogs(
   }
 }
 
-// ✅ 14. NEW FUNCTION: Get Single Blog by UID (for the detail page)
+// 14. NEW FUNCTION: Get Single Blog by UID (for the detail page)
 export async function getBlogByUID(uid: string): Promise<PrismicBlog | null> {
   try {
     const ref = await getMasterRef();
