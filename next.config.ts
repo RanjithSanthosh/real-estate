@@ -11,55 +11,68 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'images.pexels.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.prismic.io',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
         hostname: 'img.youtube.com',
         port: '',
-        pathname: '/**',
+        pathname: '/**', // Changed from '/' to '/**'
       },
       {
         protocol: "https",
         hostname: "picsum.photos",
+        pathname: '/**', // Added pathname
       },
       {
         protocol: "https",
         hostname: "flagcdn.com",
+        pathname: '/**', // Added pathname
       },
       {
         protocol: "https",
         hostname: "i.imgur.com",
+        pathname: '/**', // Added pathname
       },
       {
         protocol: "https",
         hostname: "placehold.co",
         port: "",
-        pathname: "/**", // allows any path like /1439x420, /330x70, etc.
+        pathname: "/**", // Changed to allow all paths
       },
       {
         protocol: "https",
         hostname: "images.unsplash.com",
         port: "",
-        pathname: "/**",
+        pathname: "/**", // Changed to allow all paths
       },
       {
         protocol: "https",
         hostname: "randomuser.me",
+        pathname: '/**', // Added pathname
+      },
+      // REMOVED DUPLICATE images.unsplash.com entry
+      
+      // PRISMIC AND POSTIMAGE PATTERNS
+      {
+        protocol: 'https',
+        hostname: 'images.prismic.io',
+        port: '',
+        pathname: '/**', // Changed to allow all paths
       },
       {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-        port: "",
-        pathname: "/**",
+        protocol: 'https',
+        hostname: 'i.postimg.cc',
+        port: '',
+        pathname: '/**', // Changed to allow all paths
+      },
+      {
+        protocol: 'https',
+        hostname: 'homekonnectcms.cdn.prismic.io',
+        port: '',
+        pathname: '/**', // Changed to allow all paths
+      },
+      {
+        protocol: 'https',
+        hostname: '**.prismic.io', // Use wildcard for all subdomains
+        port: '',
+        pathname: '/**',
       },
     ],
   },
