@@ -1,4 +1,6 @@
-import axios from "axios";
+
+
+import axios from 'axios';
 import {
   PrismicApiResponse,
   PrismicSearchResponse,
@@ -9,11 +11,11 @@ import {
   PrismicPropertyType,
   PrismicBuilder,
   PrismicCity,
-  PrismicBlog,
-} from "../app/data/prismic"; // Adjusted path
+  PrismicBlog
+} from '../app/data/prismic';
+
 const API_BASE = "https://homekonnectcms.prismic.io/api/v2";
-const INTEGRATION_FIELDS_REF =
-  "homekonnectcms~6e16b01a-1b51-4c1e-a58f-ee604fcec60e";
+const INTEGRATION_FIELDS_REF = "homekonnectcms~6e16b01a-1b51-4c1e-a58f-ee604fcec60e";
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -31,8 +33,8 @@ async function getMasterRef(): Promise<string> {
   }
 
   try {
-    const response = await api.get<PrismicApiResponse>("");
-    const ref = response.data.refs.find((r) => r.isMasterRef)?.ref;
+    const response = await api.get<PrismicApiResponse>('');
+    const ref = response.data.refs.find(r => r.isMasterRef)?.ref;
     if (!ref) {
       throw new Error("Master ref not found in Prismic response");
     }
@@ -63,7 +65,7 @@ const buildQueryParams = (params: Record<string, any>): string => {
 // 1. Authorization API (Used by getMasterRef)
 export async function authorization(): Promise<PrismicApiResponse | null> {
   try {
-    const response = await api.get<PrismicApiResponse>("");
+    const response = await api.get<PrismicApiResponse>('');
     return response.data;
   } catch (exception) {
     console.error("Authorization error", exception);
@@ -75,7 +77,6 @@ export async function authorization(): Promise<PrismicApiResponse | null> {
 export interface SearchPropertiesParams {
   featured?: boolean;
   propertyIds?: string[];
-  builderId?: string; // ✅ ADDED: To search by builder
   page?: number;
   pageSize?: number;
   fetch?: string[];
@@ -83,55 +84,24 @@ export interface SearchPropertiesParams {
 }
 
 export async function searchProperties(
-  params: SearchPropertiesParams = {}
+  params: SearchPropertiesParams = {},
 ): Promise<PrismicSearchResponse<PrismicProperty> | null> {
   try {
-    const ref = await getMasterRef();
+    const ref = await getMasterRef(); 
     const {
       featured,
       propertyIds = [],
-      builderId, // ✅ ADDED
       page = 1,
       pageSize = 100,
       fetch = [
-        // ✅ UPDATED: Added all fields from your static model
-        "properties.images",
-        "properties.videos",
-        "properties.full_name",
-        "properties.rera_number",
-        "properties.currency",
-        "properties.featured",
-        "properties.price_range_minimum",
-        "properties.price_range_maximum",
-        "properties.city",
-        "properties.status",
-        "properties.unit_size",
-        "properties.offer_available",
-        "properties.offer_validity",
-        "properties.location",
-        "properties.builder_name",
-        "properties.property_type_group",
-        "properties.floor_plans",
-        "properties.alert_text",
-        "properties.faq",
-        "properties.description",
-        "properties.salient_features",
-        "properties.specifications",
-        "properties.amenities",
-        "properties.overview_price_per_sqft",
-        "properties.overview_total_units",
-        "properties.overview_zoning",
-        "properties.overview_land_extent",
-        "properties.map_image",
+        'properties.images', 'properties.videos', 'properties.full_name', 'properties.rera_number',
+        'properties.currency', 'properties.featured', 'properties.price_range_minimum',
+        'properties.price_range_maximum', 'properties.city', 'properties.status', 'properties.unit_size',
+        'properties.offer_available', 'properties.offer_validity', 'properties.location',
+        'properties.builder_name', 'properties.property_type_group', 'properties.floor_plans', 'properties.alert_text'
       ],
       fetchLinks = [
-        // ✅ UPDATED: Added amenities
-        "builders.builder_name",
-        "city.city_name",
-        "property_types.property_type",
-        "property_types.icon",
-        "amenities.amenity",
-        "amenities.icon",
+        'builders.builder_name', 'city.city_name', 'property_types.property_type', 'property_types.icon'
       ],
     } = params;
 
@@ -140,13 +110,7 @@ export async function searchProperties(
       queryParams.push("[[at(my.properties.featured, true)]]");
     }
     if (propertyIds.length > 0) {
-      queryParams.push(
-        `[[in(document.id, [${propertyIds.map((id) => `"${id}"`).join(",")}])]]`
-      );
-    }
-    if (builderId) {
-      // ✅ ADDED: Query by builder ID
-      queryParams.push(`[[at(my.properties.builder_name, "${builderId}")]]`);
+      queryParams.push(`[[in(document.id, [${propertyIds.map((id) => `"${id}"`).join(",")}])]]`);
     }
 
     const paramsObj: Record<string, any> = {
@@ -182,43 +146,9 @@ export function getPropertiesByIds(
   page: number = 1,
   pageSize: number = 1000
 ) {
-  // ✅ UPDATED: Add all fetches for the detail page
-  return searchProperties({
-    propertyIds,
-    page,
-    pageSize,
-    fetch: [
-      "properties.images",
-      "properties.videos",
-      "properties.full_name",
-      "properties.rera_number",
-      "properties.currency",
-      "properties.featured",
-      "properties.price_range_minimum",
-      "properties.price_range_maximum",
-      "properties.city",
-      "properties.status",
-      "properties.unit_size",
-      "properties.offer_available",
-      "properties.offer_validity",
-      "properties.location",
-      "properties.builder_name",
-      "properties.property_type_group",
-      "properties.floor_plans",
-      "properties.alert_text",
-      "properties.faq",
-      "properties.description",
-      "properties.salient_features",
-      "properties.specifications",
-      "properties.amenities",
-      "properties.overview_price_per_sqft",
-      "properties.overview_total_units",
-      "properties.overview_zoning",
-      "properties.overview_land_extent",
-      "properties.map_image",
-    ],
-  });
+  return searchProperties({ propertyIds, page, pageSize });
 }
+
 export async function getSiteVariables() {
   try {
     const ref = await getMasterRef();
@@ -227,9 +157,7 @@ export async function getSiteVariables() {
       ref,
       integrationFieldsRef: INTEGRATION_FIELDS_REF,
     };
-    const response = await api.get(
-      `/documents/search?${buildQueryParams(params)}`
-    );
+    const response = await api.get(`/documents/search?${buildQueryParams(params)}`);
     return response.data;
   } catch (exception) {
     console.error("Site variables error", exception);
@@ -239,26 +167,20 @@ export async function getSiteVariables() {
 
 export async function getCollections(pageSize: number = 100) {
   try {
-    const ref = await getMasterRef();
+    const ref = await getMasterRef(); 
     const params = {
       q: '[[at(document.type, "collection")]]',
       pageSize,
       fetchLinks: [
-        "builders.builder_name",
-        "city.city_name",
-        "property_types.property_type",
-        "property_types.icon",
-        "properties.full_name",
-        "properties.rera_number",
+        "builders.builder_name", "city.city_name", "property_types.property_type",
+        "property_types.icon", "properties.full_name", "properties.rera_number",
         // ... all other fetchLinks
       ].join(","),
       orderings: "[my.collection.order]",
       ref,
       integrationFieldsRef: INTEGRATION_FIELDS_REF,
     };
-    const response = await api.get(
-      `/documents/search?${buildQueryParams(params)}`
-    );
+    const response = await api.get(`/documents/search?${buildQueryParams(params)}`);
     return response.data;
   } catch (exception) {
     console.error("Collections error", exception);
@@ -277,9 +199,7 @@ export async function getAmenities(pageSize: number = 100) {
       ref,
       integrationFieldsRef: INTEGRATION_FIELDS_REF,
     };
-    const response = await api.get(
-      `/documents/search?${buildQueryParams(params)}`
-    );
+    const response = await api.get(`/documents/search?${buildQueryParams(params)}`);
     return response.data;
   } catch (exception) {
     console.error("Amenities error", exception);
@@ -289,7 +209,7 @@ export async function getAmenities(pageSize: number = 100) {
 
 export async function getPropertyTypes(pageSize: number = 100) {
   try {
-    const ref = await getMasterRef();
+    const ref = await getMasterRef(); 
     const params = {
       q: '[[at(document.type, "property_types")]]',
       pageSize,
@@ -297,9 +217,7 @@ export async function getPropertyTypes(pageSize: number = 100) {
       ref,
       integrationFieldsRef: INTEGRATION_FIELDS_REF,
     };
-    const response = await api.get(
-      `/documents/search?${buildQueryParams(params)}`
-    );
+    const response = await api.get(`/documents/search?${buildQueryParams(params)}`);
     return response.data;
   } catch (exception) {
     console.error("Property types error", exception);
@@ -307,49 +225,35 @@ export async function getPropertyTypes(pageSize: number = 100) {
   }
 }
 
-export interface GetBuildersParams {
-  page?: number;
-  pageSize?: number;
-}
-
-// ✅ REPLACE your old getBuilders function with this one
-export async function getBuilders(
-  params: GetBuildersParams = {} // Accept an object
-): Promise<PrismicSearchResponse<PrismicBuilder> | null> {
+export async function getBuilders(page: number = 1, pageSize: number = 100) {
   try {
-    const ref = await getMasterRef(); // Destructure the params object with default values
-    const { page = 1, pageSize = 100 } = params;
-
-    const queryParams = {
+    const ref = await getMasterRef(); 
+    const params = {
       q: '[[at(document.type, "builders")]]',
       pageSize,
       page,
       ref,
       integrationFieldsRef: INTEGRATION_FIELDS_REF,
-    }; // This line (322) will now work correctly
-
-    const response = await api.get(
-      `/documents/search?${buildQueryParams(queryParams)}`
-    );
+    };
+    const response = await api.get(`/documents/search?${buildQueryParams(params)}`);
     return response.data;
   } catch (exception) {
     console.error("Builders error", exception);
     return null;
   }
 }
+
 export async function getCities(pageSize: number = 100) {
   try {
-    const ref = await getMasterRef();
+    const ref = await getMasterRef(); 
     const params = {
       q: '[[at(document.type, "city")]]',
       pageSize,
       ref,
       integrationFieldsRef: INTEGRATION_FIELDS_REF,
-      fetch: "city.city_name,city.location",
+      fetch: 'city.city_name,city.location'
     };
-    const response = await api.get(
-      `/documents/search?${buildQueryParams(params)}`
-    );
+    const response = await api.get(`/documents/search?${buildQueryParams(params)}`);
     return response.data;
   } catch (exception) {
     console.error("Cities error", exception);
@@ -370,15 +274,15 @@ export async function getBuilderById(builderId: string) {
       ref,
       integrationFieldsRef: INTEGRATION_FIELDS_REF,
     };
-    const response = await api.get(
-      `/documents/search?${buildQueryParams(params)}`
-    );
+    const response = await api.get(`/documents/search?${buildQueryParams(params)}`);
     return response.data.results?.[0] || null;
   } catch (exception) {
     console.error("Single builder error", exception);
     return null;
   }
 }
+
+
 
 // 13. NEW FUNCTION: Search Blogs
 export async function searchBlogs(
@@ -397,13 +301,13 @@ export async function searchBlogs(
 
     const paramsObj: Record<string, any> = {
       q: queryParams,
-      orderings: "[my.blogs.date desc]", // Order by date descending
+      orderings: '[my.blogs.date desc]', // Order by date descending
       pageSize,
       page,
       // Fetch only the fields needed for the list page
-      fetch: "blogs.title,blogs.link_title,blogs.date,blogs.image_link",
+      fetch: 'blogs.title,blogs.link_title,blogs.date,blogs.image_link',
       ref: ref,
-      integrationFieldsRef: INTEGRATION_FIELDS_REF,
+      integrationFieldsRef: INTEGRATION_FIELDS_REF
     };
 
     const queryString = buildQueryParams(paramsObj);
@@ -422,7 +326,7 @@ export async function getBlogByUID(uid: string): Promise<PrismicBlog | null> {
     const paramsObj: Record<string, any> = {
       q: `[[at(my.blogs.uid, "${uid}")]]`, // Query by the UID (slug)
       ref: ref,
-      integrationFieldsRef: INTEGRATION_FIELDS_REF,
+      integrationFieldsRef: INTEGRATION_FIELDS_REF
       // No 'fetch' param means we get the FULL document
     };
 
@@ -452,35 +356,32 @@ export interface PrismicOrdering {
 /**
  * Fetches entries from Prismic CMS
  */
-export async function GetEntriesPrismic(
-  contentType: string,
-  ordering?: PrismicOrdering
-): Promise<TeamMember[] | null> {
+export async function GetEntriesPrismic(contentType: string, ordering?: PrismicOrdering): Promise<TeamMember[] | null> {
   try {
     // Step 1: Fetch the API metadata to get ref and integrationFieldsRef
     const apiResponse = await fetch(API_BASE);
     const apiData = await apiResponse.json();
-
+    
     // Get the master ref and integrationFieldsRef
     const masterRef = apiData.refs.find((ref: any) => ref.isMasterRef)?.ref;
     const integrationFieldsRef = apiData.integrationFieldsRef;
 
     if (!masterRef || !integrationFieldsRef) {
-      throw new Error("Could not fetch required API references");
+      throw new Error('Could not fetch required API references');
     }
 
     // Step 2: Construct the search URL with all required parameters
     const searchParams = new URLSearchParams({
       q: `[[at(document.type, "${contentType}")]]`,
-      orderings: ordering ? `[${ordering.field} ${ordering.direction}]` : "",
-      pageSize: "100",
+      orderings: ordering ? `[${ordering.field} ${ordering.direction}]` : '',
+      pageSize: '100',
       ref: masterRef,
       integrationFieldsRef: integrationFieldsRef,
-      "x-c": "js-7.20.0",
+      'x-c': 'js-7.20.0'
     });
 
     const searchUrl = `${API_BASE}/documents/search?${searchParams}`;
-
+    
     // Step 3: Fetch the actual data
     const results = await fetch(searchUrl);
     const data = await results.json();
@@ -489,14 +390,14 @@ export async function GetEntriesPrismic(
       const outputs = data.results.map((p: any) => {
         const memberData = p.data;
         const uid = p.uid;
-        return {
-          ...memberData,
+        return { 
+          ...memberData, 
           id: uid,
           // Map the Prismic data to match your TeamMember interface
-          name: memberData.name?.[0]?.text || "Unknown",
-          department: memberData.job_title || "General",
-          image: memberData.image_link?.url || "/assets/placeholder.jpg",
-          designation: memberData.designation || "",
+          name: memberData.name?.[0]?.text || 'Unknown',
+          department: memberData.job_title || 'General',
+          image: memberData.image_link?.url || '/assets/placeholder.jpg',
+          designation: memberData.designation || ''
         };
       });
       return outputs;
@@ -504,7 +405,7 @@ export async function GetEntriesPrismic(
       return null;
     }
   } catch (error) {
-    console.error("Error fetching data from Prismic:", error);
+    console.error('Error fetching data from Prismic:', error);
     return null;
   }
 }
@@ -513,10 +414,10 @@ export async function GetEntriesPrismic(
  * Fetches team members data (no static fallback)
  */
 export async function fetchTeamData(): Promise<TeamMember[]> {
-  const prismicResults = await GetEntriesPrismic("team_members", {
-    field: "team_members.uid",
-    direction: "desc",
+  const prismicResults = await GetEntriesPrismic('team_members', { 
+    field: 'team_members.uid', 
+    direction: 'desc' 
   });
-
+  
   return prismicResults || []; // Return empty array if null
 }

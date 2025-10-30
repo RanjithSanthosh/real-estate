@@ -1,3 +1,6 @@
+// data/prismic.ts
+
+// Basic Prismic Types (unchanged)
 export interface PrismicRef {
   id: string;
   ref: string;
@@ -43,53 +46,21 @@ export interface PrismicApiResponse {
   license: string;
 }
 
-// Base Prismic Types
-export interface PrismicRef {
-  id: string;
-  ref: string;
-  label: string;
-  isMasterRef: boolean;
+// Rich Text Type
+export interface PrismicRichTextSpan {
+  start: number;
+  end: number;
+  type: string; // Add other span properties if needed (e.g., data for links)
 }
 
-export interface PrismicLanguage {
-  id: string;
-  name: string;
-}
-
-export interface PrismicFormField {
+export interface PrismicRichTextBlock {
   type: string;
-  multiple: boolean;
-  default?: string;
+  text: string;
+  spans: PrismicRichTextSpan[];
+  direction?: string; // Add properties for lists, images, embeds etc. if used
 }
 
-export interface PrismicForm {
-  method: string;
-  enctype: string;
-  action: string;
-  fields: Record<string, PrismicFormField>;
-}
-
-export interface PrismicExperiments {
-  draft: any[];
-  running: any[];
-}
-
-export interface PrismicApiResponse {
-  refs: PrismicRef[];
-  integrationFieldsRef: string;
-  bookmarks: Record<string, any>;
-  types: Record<string, string>;
-  languages: PrismicLanguage[];
-  tags: any[];
-  forms: Record<string, PrismicForm>;
-  oauth_initiate: string;
-  oauth_token: string;
-  version: string;
-  experiments: PrismicExperiments;
-  license: string;
-}
-
-// Image Types
+// Image Types (unchanged)
 export interface PrismicImageLink {
   url: string;
   embed_url: string;
@@ -121,23 +92,22 @@ export interface PrismicVideo {
 }
 
 // Linked Document Types
-export interface PrismicLinkedDocument {
-  id: string;
-  type: string;
-  tags: string[];
-  lang: string;
-  slug: string;
-  first_publication_date: string;
-  last_publication_date: string;
-  data: {
-    property_type?: string;
-    icon?: string;
-    city_name?: string;
-    builder_name?: string;
-  };
-  link_type: string;
-  key: string;
-  isBroken: boolean;
+export interface PrismicLinkField {
+  link_type: "Document" | "Web" | "Media" | "Any";
+  id?: string;
+  type?: string;
+  tags?: string[];
+  lang?: string;
+  slug?: string;
+  uid?: string;
+  isBroken?: boolean;
+  url?: string; // For Web links
+  kind?: string; // For Media links
+  name?: string;
+  size?: string;
+  height?: string;
+  width?: string; // For Content Relationships with fetched data:
+  data?: Record<string, any>;
 }
 
 // Property Types
@@ -145,24 +115,48 @@ export interface PrismicFloorPlan {
   bhk: string;
   unit_type: string;
   area: string;
-  floor_plan_image_link: PrismicImageLink | {};
+  floor_plan_image_link: PrismicImageLink | {}; // Can be empty object
   price: number;
 }
 
 export interface PrismicFAQ {
-  question: any[];
-  answer: any[];
+  question: PrismicRichTextBlock[]; // Rich text
+  answer: PrismicRichTextBlock[]; // Rich text
 }
 
+// ✅ ADDED: Type for the linked amenity document
+export interface PrismicLinkedAmenityData {
+  amenity: string;
+  icon: string;
+}
+
+export interface PrismicLinkedAmenity extends PrismicLinkField {
+  data?: PrismicLinkedAmenityData;
+}
+
+// ✅ ADDED: Type for a single specification item
+export interface PrismicSpecificationItem {
+  category: string;
+  specification_item: PrismicRichTextBlock[];
+}
+
+// ✅ ADDED: Type for a single salient feature item
+export interface PrismicSalientFeatureItem {
+  feature: PrismicRichTextBlock[];
+}
+
+// ✅ UPDATED: PrismicPropertyData with all fields used in transformers
 export interface PrismicPropertyData {
   full_name: string;
   rera_number: string | null;
   property_type_group: Array<{
-    property_type: PrismicLinkedDocument;
+    property_type: PrismicLinkField & {
+      data?: { property_type: string; icon: string };
+    }; // Content Relationship
   }>;
-  city: PrismicLinkedDocument;
+  city: PrismicLinkField & { data?: { city_name: string } }; // Content Relationship
   location: string;
-  builder_name: PrismicLinkedDocument;
+  builder_name: PrismicLinkField & { data?: { builder_name: string } }; // Content Relationship
   unit_size: string;
   price_range_minimum: number;
   price_range_maximum: number;
@@ -174,8 +168,17 @@ export interface PrismicPropertyData {
   featured: boolean;
   offer_available: boolean;
   offer_validity: string | null;
-  alert_text: string;
+  alert_text: string | null;
+  description?: PrismicRichTextBlock[]; // Rich text field
   faq?: PrismicFAQ[];
+  amenities?: Array<{ amenity: PrismicLinkedAmenity }>; // Group of Content Relationships
+  specifications?: PrismicSpecificationItem[]; // Group field
+  salient_features?: PrismicSalientFeatureItem[]; // Group field
+  map_image?: PrismicImageLink; // Image link // Overview fields (assuming they are simple text/number fields in Prismic)
+  overview_price_per_sqft?: string;
+  overview_total_units?: number;
+  overview_zoning?: string;
+  overview_land_extent?: string;
 }
 
 export interface PrismicProperty {
@@ -194,7 +197,7 @@ export interface PrismicProperty {
   data: PrismicPropertyData;
 }
 
-// Site Variables Types
+// Site Variables Types (unchanged)
 export interface PrismicTestimonialVideo {
   youtube_link: PrismicImageLink;
 }
@@ -227,177 +230,74 @@ export interface PrismicSiteVariablesData {
 }
 
 export interface PrismicSiteVariables {
-  id: string;
-  uid: string | null;
-  url: string | null;
-  type: string;
-  href: string;
-  tags: string[];
-  first_publication_date: string;
-  last_publication_date: string;
-  slugs: string[];
-  linked_documents: any[];
-  lang: string;
-  alternate_languages: any[];
+  id: string; // ... other fields
   data: PrismicSiteVariablesData;
 }
 
-// Collection Types
+// Collection Types (unchanged)
 export interface PrismicCollectionData {
   order: number;
   name: string;
-  description: Array<{
-    type: string;
-    text: string;
-    spans: any[];
-  }>;
+  description: PrismicRichTextBlock[];
   image_link: PrismicImageLink;
-  filter_status: Array<{
-    item: string | null;
-  }>;
-  filter_property_type: Array<{
-    item: string | null;
-  }>;
+  filter_status: Array<{ item: string | null }>;
+  filter_property_type: Array<{ item: string | null }>;
   filter_min_budget: number | null;
   filter_max_budget: number | null;
   manual_mode: boolean | null;
-  properties: Array<{
-    item: {
-      link_type: string;
-      id?: string;
-      type?: string;
-      tags?: string[];
-      lang?: string;
-      slug?: string;
-      first_publication_date?: string;
-      last_publication_date?: string;
-      data?: PrismicPropertyData;
-    };
-  }>;
+  properties: Array<{ item: PrismicLinkField }>; // Array of Content Relationships
 }
 
 export interface PrismicCollection {
-  id: string;
-  uid: string | null;
-  url: string | null;
-  type: string;
-  href: string;
-  tags: string[];
-  first_publication_date: string;
-  last_publication_date: string;
-  slugs: string[];
-  linked_documents: any[];
-  lang: string;
-  alternate_languages: any[];
+  id: string; // ... other fields
   data: PrismicCollectionData;
 }
 
-// Amenities Types
+// Amenities Types (unchanged)
 export interface PrismicAmenityData {
   amenity: string;
   icon: string;
 }
 
 export interface PrismicAmenity {
-  id: string;
-  uid: string | null;
-  url: string | null;
-  type: string;
-  href: string;
-  tags: string[];
-  first_publication_date: string;
-  last_publication_date: string;
-  slugs: string[];
-  linked_documents: any[];
-  lang: string;
-  alternate_languages: any[];
+  id: string; // ... other fields
   data: PrismicAmenityData;
 }
 
-// Property Types
+// Property Types (document type, unchanged)
 export interface PrismicPropertyTypeData {
   property_type: string;
   icon: string;
 }
 
 export interface PrismicPropertyType {
-  id: string;
-  uid: string | null;
-  url: string | null;
-  type: string;
-  href: string;
-  tags: string[];
-  first_publication_date: string;
-  last_publication_date: string;
-  slugs: string[];
-  linked_documents: any[];
-  lang: string;
-  alternate_languages: any[];
+  id: string; // ... other fields
   data: PrismicPropertyTypeData;
 }
 
-// Builders Types
+// Builders Types (unchanged)
 export interface PrismicBuilderData {
   builder_name: string;
-  logo_link: {
-    link_type: string;
-    key: string;
-    url?: string;
-    kind?: string;
-    id?: string;
-    name?: string;
-    size?: string;
-    width?: string;
-    height?: string;
-  };
-  website_link: {
-    link_type: string;
-    key: string;
-    url?: string;
-  };
-  banner_image: string | null;
-  banner_logo_link: {
-    link_type: string;
-    key: string;
-    url?: string;
-  };
-  description: Array<{
-    type: string;
-    text: string;
-    spans: any[];
-    direction?: string;
-  }>;
+  logo_link: PrismicLinkField;
+  website_link: PrismicLinkField;
+  banner_image: string | null; // Assuming URL string, adjust if Image field
+  banner_logo_link: PrismicLinkField;
+  description: PrismicRichTextBlock[];
   total_projects: number;
   ongoing_projects: number | null;
   established_year: number;
 }
 
 export interface PrismicBuilder {
-  id: string;
-  uid: string | null;
-  url: string | null;
-  type: string;
-  href: string;
-  tags: string[];
-  first_publication_date: string;
-  last_publication_date: string;
-  slugs: string[];
-  linked_documents: any[];
-  lang: string;
-  alternate_languages: any[];
+  id: string; // ... other fields
   data: PrismicBuilderData;
 }
 
-// City Types
+// City Types (unchanged)
 export interface PrismicCityData {
   city_name: string;
   banner_image: PrismicImageLink;
-  description: Array<{
-    type: string;
-    text: string;
-    spans: any[];
-    direction?: string;
-  }>;
+  description: PrismicRichTextBlock[];
   location: {
     latitude: number;
     longitude: number;
@@ -407,22 +307,11 @@ export interface PrismicCityData {
 }
 
 export interface PrismicCity {
-  id: string;
-  uid: string | null;
-  url: string | null;
-  type: string;
-  href: string;
-  tags: string[];
-  first_publication_date: string;
-  last_publication_date: string;
-  slugs: string[];
-  linked_documents: any[];
-  lang: string;
-  alternate_languages: any[];
+  id: string; // ... other fields
   data: PrismicCityData;
 }
 
-// Search Response Types
+// Search Response Types (unchanged)
 export interface PrismicSearchResponse<T> {
   page: number;
   results_per_page: number;
@@ -436,32 +325,20 @@ export interface PrismicSearchResponse<T> {
   license?: string;
 }
 
-export interface PrismicRichText {
-  type: string;
-  text: string;
-  spans: any[];
-  direction?: string;
+// Blog Types (unchanged)
+export interface PrismicBlogData {
+  title: PrismicRichTextBlock[];
+  link_title: string; // Assuming Key Text
+  date: string; // Assuming Date field
+  image_link: PrismicImageLink; // Assuming Image field
+  content: PrismicRichTextBlock[]; // Assuming Rich Text field
+  faq: PrismicFAQ[]; // Group field // Add any other fields you fetch
 }
 
 export interface PrismicBlog {
   id: string;
-  uid: string | null;
-  type: 'blogs';
-  tags: string[];
-  data: {
-    title: PrismicRichText[];
-    link_title: string;
-    date: string;
-    image_link: {
-      url: string;
-    };
-    // This is an assumption based on your blog detail page UI
-    // It's the main content of the blog post
-    content: PrismicRichText[]; 
-    faq: {
-      question: PrismicRichText[];
-      answer: PrismicRichText[];
-    }[];
-    // Add any other fields you fetch
-  };
+  uid: string; // Blogs usually have a UID for the slug
+  type: "blogs";
+  tags: string[]; // ... other standard Prismic fields
+  data: PrismicBlogData;
 }

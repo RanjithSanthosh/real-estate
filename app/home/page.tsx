@@ -158,19 +158,74 @@
 
 
 
-import { Suspense } from 'react';
-import HomeClient from './HomeClient'; // We will create this component next
+// import { Suspense } from 'react';
+// import HomeClient from './HomeClient'; // We will create this component next
 
-// This is a simple UI that will be shown while the main component loads.
-function Loading() {
-    return <div>Loading...</div>;
+// // This is a simple UI that will be shown while the main component loads.
+// function Loading() {
+//     return <div>Loading...</div>;
+// }
+
+// export default function HomePage() {
+//   return (
+//     // This Suspense boundary is now correctly wrapping the client component.
+//     <Suspense fallback={<Loading />}>
+//       <HomeClient />
+//     </Suspense>
+//   );
+// }
+
+
+
+// app/home/page.tsx
+
+import HomeClient from './HomeClient';
+import { searchProperties, getBuilders } from '@/services/api'; // Adjust path if needed
+import { 
+  transformPrismicProperty, 
+  transformPrismicBuilder 
+} from '@/services/prismicTransformers'; // Adjust path if needed
+import { Property, Developer } from '@/app/data/properties'; // For types
+
+// This function now runs on the server
+async function fetchHomeData() {
+  try {
+    // 1. Fetch all properties and builders in parallel
+    const [propertiesResponse, buildersResponse] = await Promise.all([
+      searchProperties({ pageSize: 1000 }), // Get all properties
+      getBuilders({ pageSize: 100 })       // Get all builders
+    ]);
+
+    // 2. Transform the data
+    const properties: Property[] = propertiesResponse?.results
+      .map(transformPrismicProperty) || [];
+      
+    const developers: Developer[] = buildersResponse?.results
+      .map(transformPrismicBuilder) || [];
+
+    return { properties, developers };
+
+  } catch (error) {
+    console.error("Failed to fetch home data:", error);
+    return { properties: [], developers: [] }; // Return empty arrays on error
+  }
 }
 
-export default function HomePage() {
+// The Page component is now a Server Component
+export default async function HomePage() {
+  // 3. Fetch data on the server
+  const { properties, developers } = await fetchHomeData();
+
+  // 4. Pass the fetched & transformed data as props to the Client Component
   return (
-    // This Suspense boundary is now correctly wrapping the client component.
-    <Suspense fallback={<Loading />}>
-      <HomeClient />
-    </Suspense>
+    <HomeClient 
+      properties={properties} 
+      developers={developers} 
+    />
   );
 }
+
+// Your original page.tsx code had this line, I'm commenting it out
+// as it seems to be part of the HomeClient now.
+// app\home\page.tsx (173:7)  
+// <HomePage />
