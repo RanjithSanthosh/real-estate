@@ -6,6 +6,9 @@ import { blogsData, Blog } from '../data/blogs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Palmtree } from 'lucide-react';
+import { searchBlogs } from '@/services/api'; // ✅ Import API function
+import { PrismicBlog } from '@/app/data/prismic'; // ✅ Import Prismic type
+import LatestBlogsSidebar from '@/components/shared/LatestBlogsSidebar'; // ✅ Import shared component
 
 // --- Reusable card for the "Latest in Blogs" sidebar ---
 function LatestBlogCard({ blog }: { blog: Blog }) {
@@ -35,8 +38,9 @@ function LatestBlogCard({ blog }: { blog: Blog }) {
 }
 
 // --- Main Page Component ---
-export default function TermsOfUsePage() {
-    const latestBlogs = blogsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
+export default async function TermsOfUsePage() {
+    const latestBlogsResponse = await searchBlogs(1, 5);
+    const latestBlogs = (latestBlogsResponse?.results || []) as PrismicBlog[];
 
     return (
         <div className="bg-white">
@@ -77,24 +81,9 @@ export default function TermsOfUsePage() {
                         </article>
                     </div>
 
-                    {/* Sidebar: Latest in Blogs */}
-                    <aside>
-                        <div className="sticky top-24">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">
-                                LATEST IN BLOGS
-                            </h2>
-                            <div className="space-y-6">
-                                {latestBlogs.map(blog => (
-                                    <LatestBlogCard key={blog.id} blog={blog} />
-                                ))}
-                            </div>
-                            <div className="mt-6 text-center">
-                                <Link href="/blogs" className="text-sm font-semibold text-green-600 hover:underline">
-                                    View More
-                                </Link>
-                            </div>
-                        </div>
-                    </aside>
+
+                    {/* ✅ Sidebar: Replaced with the shared component */}
+                    <LatestBlogsSidebar latestBlogs={latestBlogs} />
                 </div>
             </main>
             <SiteMapFooter />

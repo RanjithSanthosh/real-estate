@@ -169,8 +169,8 @@ const getPageRoute = (label: string): string => {
     "FAQ": "/faq",
     "Pricing": "/pricing",
     "EMI Calculator": "/emi-calculator",
-    "Vastu Tips": "/resources/vastu-tips",
-    "NRI Services": "/resources/nri-services",
+    "Vastu Tips": "/vastu-tips",
+    "NRI Services": "/nri-services",
     "Get Home Loan": "/", // Or a dedicated page
   };
   return pathMap[label] || "#";
