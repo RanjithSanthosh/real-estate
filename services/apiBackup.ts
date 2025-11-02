@@ -410,6 +410,81 @@ export async function GetEntriesPrismic(contentType: string, ordering?: PrismicO
   }
 }
 
+// 13. NEW FUNCTION: Search Blogs
+export async function searchBlogsByTitle(
+  page: number = 1,
+  pageSize: number = 10,
+  query: string = "",
+  linkTitle?: string,
+  fetchAllFields: boolean = false
+): Promise<{ 
+  data: PrismicSearchResponse<PrismicBlog> | null;
+  hrefResponse?: any;
+} | null> {
+  try {
+    const ref = await getMasterRef(); // Get the valid, dynamic ref
+    const queryParams: string[] = ['[[at(document.type, "blogs")]]'];
+
+    if (query) {
+      // Search by matching text in the 'blogs.title' field
+      queryParams.push(`[[fulltext(my.blogs.title, "${query}")]]`);
+    }
+
+    if (linkTitle) {
+      // Search by specific link_title
+      queryParams.push(`[[at(my.blogs.link_title, "${linkTitle}")]]`);
+    }
+
+    const paramsObj: Record<string, any> = {
+      q: queryParams,
+      orderings: linkTitle ? '[my.blogs.uid desc]' : '[my.blogs.date desc]',
+      pageSize,
+      page,
+      ref: ref,
+      integrationFieldsRef: INTEGRATION_FIELDS_REF
+    };
+
+    // Conditionally include fetch and fetchLinks based on fetchAllFields flag
+    if (fetchAllFields) {
+      paramsObj.fetch = 'blogs.title,blogs.minutes,blogs.date,blogs.contents,blogs.image_link,blogs.preview_paragraph,blogs.author,blogs.tags,blogs.faq';
+      paramsObj.fetchLinks = 'team_members.name,team_members.image_link,team_members.hide';
+    } else {
+      // Fetch only the fields needed for the list page
+      paramsObj.fetch = 'blogs.title,blogs.link_title,blogs.date,blogs.image_link';
+    }
+
+    const queryString = buildQueryParams(paramsObj);
+    const response = await api.get(`/documents/search?${queryString}`);
+    const responseData = response.data;
+    
+    // Make second API call to the href URL
+    
+    let hrefResponseData: any = null;
+    
+    if (responseData.results && responseData.results.length > 0 && responseData.results[0].href) {
+      try {
+        console.log("Fetching href data...");
+        let hreflink = responseData.results[0].href;
+        console.log("responseData.results[0].href:", hreflink);
+
+        const hrefResponse = await api.get(hreflink);
+        console.log(hrefResponse.data.faq,"Href Response Data:", hrefResponse.data);
+         hrefResponseData = hrefResponse.data;
+      } catch (hrefError) {
+        console.error("Error fetching href data:", hrefError);
+      }
+    }
+
+    return {
+      data: hrefResponseData,
+      hrefResponse: hrefResponseData
+    };
+  } catch (exception) {
+    console.error("Error Occurred while searching blogs", exception);
+    return null;
+  }
+}
+
 /**
  * Fetches team members data (no static fallback)
  */

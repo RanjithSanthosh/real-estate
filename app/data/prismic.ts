@@ -342,3 +342,134 @@ export interface PrismicBlog {
   tags: string[]; // ... other standard Prismic fields
   data: PrismicBlogData;
 }
+
+
+// Blog-specific types that extend your existing interfaces
+
+// Blog Span interface for text formatting
+export interface PrismicBlogSpan {
+  start: number;
+  end: number;
+  type: 'em' | 'strong' | 'hyperlink';
+  data?: {
+    link_type: 'Web';
+    url: string;
+    target?: '_blank' | '_self' | '_new';
+  };
+}
+
+// Blog Dimensions for images
+export interface PrismicBlogDimensions {
+  width: number;
+  height: number;
+}
+
+// Blog Image edit information
+export interface PrismicBlogEdit {
+  x: number;
+  y: number;
+  zoom: number;
+  background: string;
+}
+
+// Blog Link information for images
+export interface PrismicBlogLinkTo {
+  link_type: 'Web';
+  url: string;
+  target?: '_blank' | '_self' | '_new';
+}
+
+// Blog Paragraph content type
+export interface PrismicBlogParagraph {
+  type: 'paragraph';
+  text: string;
+  spans: PrismicBlogSpan[];
+  direction: 'ltr';
+}
+
+// Blog Image content type
+export interface PrismicBlogImage {
+  type: 'image';
+  url: string;
+  alt: string | null;
+  copyright: string | null;
+  dimensions: PrismicBlogDimensions;
+  id: string;
+  edit: PrismicBlogEdit;
+  linkTo: PrismicBlogLinkTo;
+}
+
+// Union type for all blog content types
+export type PrismicBlogContent = PrismicBlogParagraph | PrismicBlogImage;
+
+// Blog Author information
+export interface PrismicBlogAuthor {
+  id: string;
+  type: 'team_members';
+  tags: string[];
+  lang: string;
+  slug: string;
+  first_publication_date: string;
+  last_publication_date: string;
+  uid: string;
+  link_type: 'Document';
+  key: string;
+  isBroken: boolean;
+}
+
+// Blog Image link data
+export interface PrismicBlogImageLink {
+  link_type: 'Media';
+  key: string;
+  kind: 'image';
+  id: string;
+  url: string;
+  name: string;
+  size: string;
+  width: string;
+  height: string;
+}
+
+// Blog FAQ item
+export interface PrismicBlogFAQItem {
+  question: PrismicBlogParagraph[];
+  answer: PrismicBlogParagraph[];
+}
+
+// Blog Tag item
+export interface PrismicBlogTagItem {
+  tag: string;
+}
+
+// Extended Blog Data interface that builds upon your existing PrismicBlogData
+export interface PrismicBlogExtendedData extends PrismicBlogData {
+  author: PrismicBlogAuthor;
+  preview_paragraph: PrismicBlogParagraph[];
+  contents: PrismicBlogContent[];
+  minutes: number;
+  faq: PrismicBlogFAQItem[];
+  tags: PrismicBlogTagItem[];
+}
+
+// Extended Blog Document interface
+export interface PrismicBlogExtended {
+  id: string;
+  uid: string;
+  url: string | null;
+  type: 'blogs';
+  href: string;
+  tags: string[];
+  first_publication_date: string;
+  last_publication_date: string;
+  slugs: string[];
+  linked_documents: any[];
+  lang: string;
+  alternate_languages: any[];
+  data: PrismicBlogExtendedData;
+}
+
+// Response type for your search function
+export interface PrismicBlogSearchResult {
+  data: PrismicSearchResponse<PrismicBlogExtended> | null;
+  hrefResponse?: PrismicBlogExtended;
+}

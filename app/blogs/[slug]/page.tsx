@@ -66,6 +66,7 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getBlogByUID, searchBlogs } from '@/services/api';
+import { searchBlogsByTitle } from '@/services/apiBackup';
 import { PrismicBlog } from '@/app/data/prismic';
 import BlogClientPage from './client-page';
 import Navbar from '@/components/shared/Navbar';
@@ -75,6 +76,7 @@ import DetailedFooter from '@/components/aboutPage/DetailedFooter';
 // This function generates the SEO metadata
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const blog = await getBlogByUID(params.slug);
+  console.log("blog data :",blog);
 
   if (!blog) {
     return { title: 'Blog Post Not Found' };
@@ -82,6 +84,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   const title = blog.data.title[0]?.text || 'Blog Post';
   const description = blog.data.link_title || 'Read this blog from Home Konnect.';
+
+
 
   return {
     title,
@@ -104,6 +108,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
     // We get the slug from params
     const blog = await getBlogByUID(params.slug);
+    const title = blog?.data.title[0]?.text;
 
     if (!blog) {
         notFound();
@@ -115,10 +120,15 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
       // ✅ FIX: Use params.slug here instead of the undefined 'slug'
       .filter(b => b.uid !== params.slug) as PrismicBlog[];
 
+        const relatedBlogData = await searchBlogsByTitle(1,10,title);
+
+
+  console.log("Related Blog Data:", relatedBlogData);
+
     return (
       <div className="bg-white">
         <Navbar />
-        <BlogClientPage blog={blog} relatedBlogs={relatedBlogs} />
+        <BlogClientPage blog={blog} relatedBlogs={relatedBlogData?.data?.results || []} />
         <SiteMapFooter />
         <DetailedFooter />
       </div>
