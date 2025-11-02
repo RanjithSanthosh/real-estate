@@ -40,6 +40,8 @@ function RelatedBlogCard({ blog }: { blog: PrismicBlog }) {
 export default function BlogClientPage({ blog, relatedBlogs }: { blog: PrismicBlog, relatedBlogs: PrismicBlog[] }) {
     const [buttonText, setButtonText] = useState('Share it');
 
+        console.log("Blog Data in Client Page:", relatedBlogs);
+
     if (!blog) {
         return null;
     }
