@@ -1141,6 +1141,7 @@ import { useFavorites } from "../../context/FavoritesContext";
 import { toast } from "react-hot-toast";
 import { Icon, IconName } from "@/components/shared/IconMapper";
 import { toPng } from 'html-to-image';
+import { useUI } from '../../context/UIContext';
 
 // Ensure id is always string
 type SerializableProperty = Omit<
@@ -1209,7 +1210,7 @@ function PropertyHeader({
   const propertyDetailsRef = useRef<HTMLDivElement>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
-
+const { openFilterModal, openLoginModal, openConsultationModal } = useUI();
   useEffect(() => {
     setShareUrl(window.location.href);
   }, []);
@@ -1403,10 +1404,14 @@ function PropertyHeader({
           </div>
           {!isCapturing && (
             <div className="flex flex-col sm:flex-row gap-4 mt-6">
-              <button className="flex-1 bg-white text-green-600 border-2 border-green-500 font-bold py-3 px-6 rounded-3xl hover:bg-green-50 transition w-full sm:w-auto">
+              <button 
+               className="flex-1 bg-white text-green-600 border-2 border-green-500 font-bold py-3 px-6 rounded-3xl hover:bg-green-50 transition w-full sm:w-auto"
+               onClick={openConsultationModal}>
                 Download Brochure
               </button>
-              <button className="flex-1 bg-green-500 text-white font-bold py-3 px-6 rounded-3xl hover:bg-green-600 transition flex items-center justify-center gap-2 w-full sm:w-auto">
+              <button 
+               className="flex-1 bg-green-500 text-white font-bold py-3 px-6 rounded-3xl hover:bg-green-600 transition flex items-center justify-center gap-2 w-full sm:w-auto"
+                onClick={openConsultationModal}>
                 <Phone size={18} /> Call Us
               </button>
             </div>

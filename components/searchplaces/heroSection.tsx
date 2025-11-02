@@ -343,6 +343,7 @@ import {
 import heroImage from "../../public/assets/Hero.png"; // ✅ 1. IMPORT THE IMAGE HERE (adjust path if needed)
 import eteImage from "../../public/assets/ETEproperty.png"; // ✅ 1. IMPORT THE IMAGE HERE (adjust path if needed)
 import logoImage  from "../../public/assets/logo.png";
+import { useUI } from '../../app/context/UIContext';
 
 // Interface for type safety
 interface Service {
@@ -357,6 +358,7 @@ export default function HeroSection() {
   const [selectedCity, setSelectedCity] = useState("All Cities");
   const cityDropdownRef = useRef<HTMLDivElement>(null);
   const cities = ["Mumbai", "Delhi", "Bangalore", "Chennai", "Kolkata"];
+  const {  openConsultationModal } = useUI();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -453,7 +455,9 @@ export default function HeroSection() {
               </div>
 
               <div className="flex items-center gap-4 ">
-                <button className="hidden sm:flex items-center gap-2 border backdrop-blur-sm px-4 py-2 rounded-3xl font-medium">
+                <button className="hidden sm:flex items-center gap-2 border backdrop-blur-sm px-4 py-2 rounded-3xl font-medium"
+                onClick={openConsultationModal}>
+
                   <Phone size={16} /> Call Us <span className="ml-1">🇮🇳</span>
                 </button>
                 <button className="hidden md:block p-2 hover:bg-white/20 rounded-full transition-colors"><Heart size={20} /></button>

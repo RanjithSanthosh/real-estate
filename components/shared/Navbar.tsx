@@ -27,7 +27,7 @@ const RESOURCE_LINKS = [
 ];
 
 export default function Navbar() {
-  const { openLoginModal } = useUI();
+  const { openLoginModal,openConsultationModal } = useUI();
 
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
@@ -107,7 +107,8 @@ export default function Navbar() {
 
           {/* Right side icons and button */}
           <div className="flex items-center gap-4">
-            <button className="hidden sm:flex items-center gap-2 border border-gray-300 px-4 py-2 rounded-full font-medium text-sm  hover:bg-gray-50 transition">
+            <button className="hidden sm:flex items-center gap-2 border border-gray-300 px-4 py-2 rounded-full font-medium text-sm  hover:bg-gray-50 transition"
+            onClick={openConsultationModal}>
               <Phone size={16} className="" />
               Call Us <span className="ml-1 text-gray-400">|</span> 🇮🇳
             </button>
